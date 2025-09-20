@@ -38,8 +38,8 @@ const userData = computed(() => auth.user?.user_metadata);
           <h3 class="text-lg font-semibold text-gray-200 mb-2">
             Total Balance
           </h3>
-          <p class="text-3xl font-bold text-green-400">$12,450.00</p>
-          <p class="text-sm text-gray-500 mt-1">+2.5% from last month</p>
+          <p class="text-3xl font-bold text-green-400">Rp. <span>12.450.000</span></p>
+          <p class="text-sm text-gray-500 mt-1"><span>+2.5%</span> from last month</p>
         </div>
 
         <!-- Card 2 -->
@@ -49,8 +49,8 @@ const userData = computed(() => auth.user?.user_metadata);
           <h3 class="text-lg font-semibold text-gray-200 mb-2">
             Monthly Expenses
           </h3>
-          <p class="text-3xl font-bold text-red-400">$3,240.00</p>
-          <p class="text-sm text-gray-500 mt-1">-5.2% from last month</p>
+          <p class="text-3xl font-bold text-red-400">Rp. <span>3.240.000</span></p>
+          <p class="text-sm text-gray-500 mt-1"><span>-5.2%</span> from last month</p>
         </div>
 
         <!-- Card 3 -->
@@ -60,7 +60,7 @@ const userData = computed(() => auth.user?.user_metadata);
           <h3 class="text-lg font-semibold text-gray-200 mb-2">
             Monthly Income
           </h3>
-          <p class="text-3xl font-bold text-blue-400">$8,500.00</p>
+          <p class="text-3xl font-bold text-blue-400">Rp. <span>8.500.000</span></p>
           <p class="text-sm text-gray-500 mt-1">Same as last month</p>
         </div>
       </div>
@@ -78,7 +78,7 @@ const userData = computed(() => auth.user?.user_metadata);
               <p class="font-medium text-gray-200">Grocery Shopping</p>
               <p class="text-sm text-gray-500">Today, 2:30 PM</p>
             </div>
-            <span class="text-red-400 font-semibold">-$125.50</span>
+            <span class="text-red-400 font-semibold">- Rp. <span>125.500</span></span>
           </div>
           <div
             class="flex justify-between items-center py-2 border-b border-gray-800"
@@ -87,14 +87,14 @@ const userData = computed(() => auth.user?.user_metadata);
               <p class="font-medium text-gray-200">Salary Deposit</p>
               <p class="text-sm text-gray-500">Yesterday, 9:00 AM</p>
             </div>
-            <span class="text-green-400 font-semibold">+$4,200.00</span>
+            <span class="text-green-400 font-semibold">+ Rp. <span>4.200.000</span></span>
           </div>
           <div class="flex justify-between items-center py-2">
             <div>
               <p class="font-medium text-gray-200">Coffee Shop</p>
               <p class="text-sm text-gray-500">2 days ago, 8:15 AM</p>
             </div>
-            <span class="text-red-400 font-semibold">-$4.50</span>
+            <span class="text-red-400 font-semibold">- Rp. <span>45.000</span></span>
           </div>
         </div>
       </div>

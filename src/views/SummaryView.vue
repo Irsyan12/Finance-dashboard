@@ -14,7 +14,7 @@ const transactions = ref([
   {
     id: 1,
     type: "income",
-    amount: 4200,
+    amount: 4200000,
     category: "Salary",
     date: "2024-01-01",
     description: "Monthly Salary",
@@ -22,7 +22,7 @@ const transactions = ref([
   {
     id: 2,
     type: "expense",
-    amount: 125.5,
+    amount: 125500,
     category: "Food & Dining",
     date: "2024-01-02",
     description: "Grocery Shopping",
@@ -30,7 +30,7 @@ const transactions = ref([
   {
     id: 3,
     type: "expense",
-    amount: 4.5,
+    amount: 4500,
     category: "Food & Dining",
     date: "2024-01-02",
     description: "Coffee Shop",
@@ -38,7 +38,7 @@ const transactions = ref([
   {
     id: 4,
     type: "expense",
-    amount: 800,
+    amount: 800000,
     category: "Bills & Utilities",
     date: "2024-01-03",
     description: "Electricity Bill",
@@ -46,7 +46,7 @@ const transactions = ref([
   {
     id: 5,
     type: "income",
-    amount: 200,
+    amount: 200000,
     category: "Freelancing",
     date: "2024-01-03",
     description: "Web Design Project",
@@ -54,7 +54,7 @@ const transactions = ref([
   {
     id: 6,
     type: "expense",
-    amount: 60,
+    amount: 60000,
     category: "Transportation",
     date: "2024-01-04",
     description: "Gas",
@@ -62,7 +62,7 @@ const transactions = ref([
   {
     id: 7,
     type: "expense",
-    amount: 25,
+    amount: 25000,
     category: "Entertainment",
     date: "2024-01-05",
     description: "Movie Tickets",
@@ -151,7 +151,7 @@ const savingsRate = computed(() => {
             <div>
               <p class="text-sm text-gray-400 mb-1">Total Income</p>
               <p class="text-2xl font-bold text-green-400">
-                ${{ totalIncome.toFixed(2) }}
+                Rp {{ totalIncome.toLocaleString("id-ID") }}
               </p>
             </div>
             <div class="p-3 bg-green-900/20 rounded-full">
@@ -168,7 +168,7 @@ const savingsRate = computed(() => {
             <div>
               <p class="text-sm text-gray-400 mb-1">Total Expenses</p>
               <p class="text-2xl font-bold text-red-400">
-                ${{ totalExpenses.toFixed(2) }}
+                Rp {{ totalExpenses.toLocaleString("id-ID") }}
               </p>
             </div>
             <div class="p-3 bg-red-900/20 rounded-full">
@@ -188,7 +188,7 @@ const savingsRate = computed(() => {
                 class="text-2xl font-bold"
                 :class="balance >= 0 ? 'text-blue-400' : 'text-red-400'"
               >
-                ${{ balance.toFixed(2) }}
+                Rp. <span>{{ balance.toLocaleString("id-ID") }}</span>
               </p>
             </div>
             <div class="p-3 bg-blue-900/20 rounded-full">
@@ -240,8 +240,11 @@ const savingsRate = computed(() => {
                     }"
                   ></div>
                 </div>
-                <span class="text-red-400 font-semibold w-16 text-right"
-                  >${{ category.amount.toFixed(2) }}</span
+                <span class="text-red-400 font-semibold w-22 text-right"
+                  >Rp.
+                  <span>{{
+                    category.amount.toLocaleString("id-ID")
+                  }}</span></span
                 >
               </div>
             </div>
@@ -271,8 +274,11 @@ const savingsRate = computed(() => {
                     }"
                   ></div>
                 </div>
-                <span class="text-green-400 font-semibold w-16 text-right"
-                  >${{ category.amount.toFixed(2) }}</span
+                <span class="text-green-400 font-semibold w-22 text-right"
+                  >Rp.
+                  <span>{{
+                    category.amount.toLocaleString("id-ID")
+                  }}</span></span
                 >
               </div>
             </div>
@@ -323,9 +329,8 @@ const savingsRate = computed(() => {
                   : 'text-red-400',
               ]"
             >
-              {{ transaction.type === "income" ? "+" : "-" }}${{
-                transaction.amount.toFixed(2)
-              }}
+              {{ transaction.type === "income" ? "+" : "-" }}Rp
+              {{ transaction.amount.toLocaleString("id-ID") }}
             </span>
           </div>
         </div>
@@ -342,9 +347,8 @@ const savingsRate = computed(() => {
               Top Spending Category
             </h4>
             <p class="text-gray-300">
-              {{ expensesByCategory[0]?.name || "No expenses" }} - ${{
-                expensesByCategory[0]?.amount.toFixed(2) || "0.00"
-              }}
+              {{ expensesByCategory[0]?.name || "No expenses" }} - Rp
+              {{ expensesByCategory[0]?.amount.toLocaleString("id-ID") || "0" }}
             </p>
           </div>
           <div class="p-4 bg-green-900/20 rounded-lg border border-green-800">
@@ -352,9 +356,8 @@ const savingsRate = computed(() => {
               Primary Income Source
             </h4>
             <p class="text-gray-300">
-              {{ incomeByCategory[0]?.name || "No income" }} - ${{
-                incomeByCategory[0]?.amount.toFixed(2) || "0.00"
-              }}
+              {{ incomeByCategory[0]?.name || "No income" }} - Rp
+              {{ incomeByCategory[0]?.amount.toLocaleString("id-ID") || "0" }}
             </p>
           </div>
         </div>

@@ -86,7 +86,7 @@ const sidebarCollapsed = inject("sidebarCollapsed", ref(false));
       <div class="absolute bottom-6 left-4 right-4">
         <button
           @click="logout"
-          class="flex items-center w-full p-3 text-red-400 rounded-lg hover:bg-red-900/20 hover:text-red-300 transition-colors group"
+          class="flex items-center w-full p-3 text-red-400 rounded-lg hover:bg-red-900/20 hover:text-red-300 hover:cursor-pointer transition-colors group"
           :class="sidebarCollapsed ? 'justify-center' : ''"
           :title="sidebarCollapsed ? 'Logout' : ''"
         >

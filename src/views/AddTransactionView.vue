@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from "../components/AppLayout.vue";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import {
   PlusIcon,
   CalendarIcon,
@@ -10,11 +10,26 @@ import {
 } from "@heroicons/vue/24/outline";
 
 const form = ref({
-  amount: "",
+  amount: null, // angka mentah tanpa format
   description: "",
   category: "",
   type: "expense", // 'expense' or 'income'
   date: new Date().toISOString().split("T")[0],
+});
+
+// tampilan amount yang sudah diformat
+const displayAmount = ref("");
+
+watch(displayAmount, (val) => {
+  // hanya izinkan angka
+  const numeric = val.replace(/\D/g, "");
+  if (numeric) {
+    form.value.amount = Number(numeric);
+    displayAmount.value = Number(numeric).toLocaleString("id-ID"); // format ribuan (Indonesia)
+  } else {
+    form.value.amount = null;
+    displayAmount.value = "";
+  }
 });
 
 const categories = ref([
@@ -33,34 +48,32 @@ const isSubmitting = ref(false);
 
 const submitTransaction = async () => {
   isSubmitting.value = true;
-  // Simulate API call
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
   console.log("Transaction submitted:", form.value);
 
-  // Reset form
   form.value = {
-    amount: "",
+    amount: null,
     description: "",
     category: "",
     type: "expense",
     date: new Date().toISOString().split("T")[0],
   };
+  displayAmount.value = "";
 
   isSubmitting.value = false;
-
-  // Show success message (you can add a toast notification here)
   alert("Transaction added successfully!");
 };
 
 const clearForm = () => {
   form.value = {
-    amount: "",
+    amount: null,
     description: "",
     category: "",
     type: "expense",
     date: new Date().toISOString().split("T")[0],
   };
+  displayAmount.value = "";
 };
 </script>
 
@@ -114,11 +127,10 @@ const clearForm = () => {
             </label>
             <input
               id="amount"
-              v-model="form.amount"
-              type="number"
-              step="0.01"
+              v-model="displayAmount"
+              type="text"
               required
-              class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="no-spinner w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Enter amount"
             />
           </div>
@@ -229,7 +241,7 @@ const clearForm = () => {
                 Today, 2:30 PM • Food & Dining
               </p>
             </div>
-            <span class="text-red-400 font-semibold">-$125.50</span>
+            <span class="text-red-400 font-semibold">-Rp 125.500</span>
           </div>
           <div
             class="flex justify-between items-center py-2 border-b border-gray-800"
@@ -238,7 +250,7 @@ const clearForm = () => {
               <p class="font-medium text-gray-200">Salary Deposit</p>
               <p class="text-sm text-gray-500">Yesterday, 9:00 AM • Income</p>
             </div>
-            <span class="text-green-400 font-semibold">+$4,200.00</span>
+            <span class="text-green-400 font-semibold">+Rp 4.200.000</span>
           </div>
           <div class="flex justify-between items-center py-2">
             <div>
@@ -247,7 +259,7 @@ const clearForm = () => {
                 2 days ago, 8:15 AM • Food & Dining
               </p>
             </div>
-            <span class="text-red-400 font-semibold">-$4.50</span>
+            <span class="text-red-400 font-semibold">-Rp 4.500</span>
           </div>
         </div>
       </div>

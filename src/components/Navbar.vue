@@ -32,7 +32,7 @@ const toggleSidebar = () => {
   >
     <!-- Brand & Sidebar Toggle -->
     <div class="flex items-center gap-4">
-      <div class="text-lg font-bold">Finance Dashboard</div>
+      <a href="/" class="text-lg font-bold">Finance Dashboard</a>
       <button
         @click="toggleSidebar"
         class="p-2 rounded-lg hover:bg-gray-700 transition-colors"
