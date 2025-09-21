@@ -1,6 +1,5 @@
 <script setup>
-import { useAuthStore } from "../stores/auth";
-import { computed, ref, inject } from "vue";
+import { ref, inject } from "vue";
 import {
   Bars3Icon,
   XMarkIcon,
@@ -8,10 +7,14 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@heroicons/vue/24/outline";
+import { useUserData } from "../composables/useData";
+import { useAuthStore } from "../stores/auth";
 
+// Gunakan composable untuk user data
+const { userData, isLoggedIn } = useUserData();
+
+// Gunakan auth store untuk logout action
 const auth = useAuthStore();
-auth.fetchUser();
-const userData = computed(() => auth.user?.user_metadata);
 
 const isOpen = ref(false);
 
@@ -35,7 +38,7 @@ const toggleSidebar = () => {
       <a href="/" class="text-lg font-bold">Finance Dashboard</a>
       <button
         @click="toggleSidebar"
-        class="p-2 rounded-lg hover:bg-gray-700 transition-colors"
+        class="p-2 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors"
         title="Toggle Sidebar"
       >
         <ChevronLeftIcon v-if="!sidebarCollapsed" class="w-5 h-5" />
@@ -45,11 +48,16 @@ const toggleSidebar = () => {
 
     <!-- Medium screen navbar -->
     <div class="hidden md:flex items-center">
-      <div v-if="auth.user" class="flex items-center gap-4">
+      <div v-if="isLoggedIn" class="flex items-center gap-4">
         <span>Hello, {{ userData?.full_name }}</span>
+        <img
+          :src="userData?.avatar_url"
+          alt=""
+          class="w-8 h-8 rounded-full object-cover border border-gray-400"
+        />
         <button
           @click="auth.logout"
-          class="flex items-center gap-2 px-4 py-2 bg-red-500 rounded hover:bg-red-600 hover:cursor-pointer transition"
+          class="flex items-center gap-2 px-2 py-2 bg-red-500 rounded hover:bg-red-600 hover:cursor-pointer transition"
         >
           <ArrowRightEndOnRectangleIcon class="h-4 w-4" />
           Logout
@@ -69,10 +77,12 @@ const toggleSidebar = () => {
     <div class="md:hidden flex items-center">
       <button
         @click="isOpen = !isOpen"
-        class="p-2 rounded hover:bg-gray-700 transition"
       >
-        <Bars3Icon v-if="!isOpen" class="h-6 w-6" />
-        <XMarkIcon v-else class="h-6 w-6" />
+        <img
+          :src="userData?.avatar_url || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'"
+          alt=""
+          class="w-8 h-8 rounded-full object-cover border border-gray-400"
+        />
       </button>
     </div>
   </nav>
@@ -80,9 +90,9 @@ const toggleSidebar = () => {
   <!-- Mobile dropdown menu -->
   <div
     v-if="isOpen"
-    class="md:hidden bg-gray-800 border-b border-gray-700 text-white absolute right-0 top-16 rounded-b-xl w-60 p-4 space-y-4 shadow-lg"
+    class="md:hidden bg-gray-800 border-b border-gray-700 text-white absolute right-4 top-16 rounded-b-xl w-60 p-4 space-y-4 shadow-lg"
   >
-    <div v-if="auth.user" class="w-60 space-y-2">
+    <div v-if="isLoggedIn" class="w-60 space-y-2">
       <span>{{ userData?.full_name }}</span>
       <button
         @click="auth.logout"

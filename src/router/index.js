@@ -4,6 +4,7 @@ import DashboardView from "../views/DashboardView.vue";
 import AddTransactionView from "../views/AddTransactionView.vue";
 import EditCategoriesView from "../views/EditCategoriesView.vue";
 import SummaryView from "../views/SummaryView.vue";
+import TransactionHistoryView from "@/views/TransactionHistoryView.vue";
 
 const routes = [
   { path: "/", component: DashboardView },
@@ -11,6 +12,7 @@ const routes = [
   { path: "/addtransaction", component: AddTransactionView },
   { path: "/editcategories", component: EditCategoriesView },
   { path: "/summary", component: SummaryView },
+  { path: "/history", component: TransactionHistoryView }
 ];
 
 const router = createRouter({

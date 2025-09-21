@@ -8,6 +8,7 @@ import {
   CalendarIcon,
   CurrencyDollarIcon,
 } from "@heroicons/vue/24/outline";
+import Header from "../components/View/Header.vue";
 
 // Sample data
 const transactions = ref([
@@ -121,10 +122,7 @@ const savingsRate = computed(() => {
     <div class="space-y-6">
       <!-- Header -->
       <div class="flex justify-between items-center">
-        <div>
-          <h1 class="text-3xl font-bold text-white mb-2">Summary</h1>
-          <p class="text-gray-400">Financial overview and insights</p>
-        </div>
+        <Header title="Financial Summary" subtitle="Overview of your finances" />
 
         <!-- Period Selector -->
         <div class="flex items-center space-x-2">

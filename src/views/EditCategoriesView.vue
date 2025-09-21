@@ -1,6 +1,10 @@
 <script setup>
 import AppLayout from "../components/AppLayout.vue";
 import { ref, computed } from "vue";
+import { categoriesData } from "@/lib/data";
+import { useUserData } from "../composables/useData";
+import Header from "../components/View/Header.vue";
+
 import {
   PlusIcon,
   PencilIcon,
@@ -10,17 +14,16 @@ import {
   CheckIcon,
 } from "@heroicons/vue/24/outline";
 
-const categories = ref([
-  { id: 1, name: "Food & Dining", color: "#ef4444", type: "expense" },
-  { id: 2, name: "Transportation", color: "#3b82f6", type: "expense" },
-  { id: 3, name: "Shopping", color: "#8b5cf6", type: "expense" },
-  { id: 4, name: "Entertainment", color: "#f59e0b", type: "expense" },
-  { id: 5, name: "Bills & Utilities", color: "#10b981", type: "expense" },
-  { id: 6, name: "Healthcare", color: "#06b6d4", type: "expense" },
-  { id: 7, name: "Salary", color: "#22c55e", type: "income" },
-  { id: 8, name: "Freelance", color: "#84cc16", type: "income" },
-  { id: 9, name: "Investment", color: "#6366f1", type: "income" },
-]);
+const { userData, user, isLoggedIn } = useUserData();
+const categoriesComputed = computed(() => [...categoriesData]);
+const Allcategories = ref([...categoriesComputed.value]);
+
+// filter categories berdasarkan user login - make it reactive
+const categories = computed(() =>
+  Allcategories.value.filter((c) => c.user_id === user.value?.id)
+);
+
+console.log(user.value?.id);
 
 const isAddingCategory = ref(false);
 const editingCategory = ref(null);
@@ -49,6 +52,10 @@ const availableColors = [
   "#d946ef",
   "#ec4899",
   "#f43f5e",
+  "#f87171",
+  "#fca5a5",
+  "#fefefe",
+  "#000000",
 ];
 
 const startAddCategory = () => {
@@ -71,9 +78,10 @@ const cancelAddCategory = () => {
 
 const saveNewCategory = () => {
   if (newCategory.value.name.trim()) {
-    const id = Math.max(...categories.value.map((c) => c.id)) + 1;
-    categories.value.push({
+    const id = Math.max(...Allcategories.value.map((c) => c.id)) + 1;
+    Allcategories.value.push({
       id,
+      user_id: user.value?.id, // Add user_id when creating new category
       ...newCategory.value,
     });
     cancelAddCategory();
@@ -90,11 +98,11 @@ const cancelEditCategory = () => {
 
 const saveEditCategory = () => {
   if (editingCategory.value && editingCategory.value.name.trim()) {
-    const index = categories.value.findIndex(
+    const index = Allcategories.value.findIndex(
       (c) => c.id === editingCategory.value.id
     );
     if (index !== -1) {
-      categories.value[index] = { ...editingCategory.value };
+      Allcategories.value[index] = { ...editingCategory.value };
     }
     editingCategory.value = null;
   }
@@ -106,7 +114,10 @@ const deleteCategory = (categoryId) => {
       "Are you sure you want to delete this category? This action cannot be undone."
     )
   ) {
-    categories.value = categories.value.filter((c) => c.id !== categoryId);
+    const index = Allcategories.value.findIndex((c) => c.id === categoryId);
+    if (index !== -1) {
+      Allcategories.value.splice(index, 1);
+    }
   }
 };
 
@@ -122,10 +133,10 @@ const incomeCategories = computed(() =>
   <AppLayout>
     <div class="space-y-6">
       <!-- Header -->
-      <div>
-        <h1 class="text-3xl font-bold text-white mb-2">Manage Categories</h1>
-        <p class="text-gray-400">Organize your transaction categories</p>
-      </div>
+      <Header
+        title="Manage Categories"
+        subtitle="Organize your transaction categories"
+      />
 
       <!-- Add New Category -->
       <div class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800">
@@ -133,7 +144,7 @@ const incomeCategories = computed(() =>
           <h3 class="text-lg font-semibold text-gray-200">Categories</h3>
           <button
             @click="startAddCategory"
-            class="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            class="flex items-center cursor-pointer space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <PlusIcon class="w-4 h-4" />
             <span>Add Category</span>
@@ -214,8 +225,11 @@ const incomeCategories = computed(() =>
         </div>
       </div>
 
-      <!-- Expense Categories -->
-      <div class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800">
+      <!-- Expense Categories ------------------------------------------------------- -->
+      <div
+        v-if="isLoggedIn"
+        class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
+      >
         <h3 class="text-lg font-semibold text-gray-200 mb-4 flex items-center">
           <TagIcon class="w-5 h-5 mr-2 text-red-400" />
           Expense Categories
@@ -223,6 +237,7 @@ const incomeCategories = computed(() =>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div
+            v-if="expenseCategories.length > 0"
             v-for="category in expenseCategories"
             :key="category.id"
             class="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-gray-600 transition-colors"
@@ -297,10 +312,19 @@ const incomeCategories = computed(() =>
             </div>
           </div>
         </div>
+        <div
+          v-if="expenseCategories.length === 0"
+          class="text-gray-400 text-center"
+        >
+          No categories found. Please add a category.
+        </div>
       </div>
 
       <!-- Income Categories -->
-      <div class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800">
+      <div
+        v-if="isLoggedIn"
+        class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
+      >
         <h3 class="text-lg font-semibold text-gray-200 mb-4 flex items-center">
           <TagIcon class="w-5 h-5 mr-2 text-green-400" />
           Income Categories
@@ -308,6 +332,7 @@ const incomeCategories = computed(() =>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div
+            v-if="incomeCategories.length > 0"
             v-for="category in incomeCategories"
             :key="category.id"
             class="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-gray-600 transition-colors"
@@ -382,10 +407,19 @@ const incomeCategories = computed(() =>
             </div>
           </div>
         </div>
+        <div
+          v-if="incomeCategories.length === 0"
+          class="text-gray-400 text-center"
+        >
+          No categories found. Please add a category.
+        </div>
       </div>
 
       <!-- Usage Statistics -->
-      <div class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800">
+      <div
+        v-if="isLoggedIn"
+        class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
+      >
         <h3 class="text-lg font-semibold text-gray-200 mb-4">Category Usage</h3>
         <div class="space-y-3">
           <div

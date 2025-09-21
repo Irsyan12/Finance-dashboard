@@ -3,6 +3,7 @@ import {
   PlusIcon,
   ChartBarIcon,
   TagIcon,
+  ClockIcon,
   ArrowRightEndOnRectangleIcon,
 } from "@heroicons/vue/24/outline";
 import { useAuth } from "../composables/useAuth";
@@ -19,7 +20,7 @@ const sidebarCollapsed = inject("sidebarCollapsed", ref(false));
     id="default-sidebar"
     :class="[
       'fixed top-16 left-0 z-40 h-[calc(100vh-4rem)] transition-all duration-300 border-r border-gray-700 bg-gray-900',
-      sidebarCollapsed ? 'w-16' : 'w-64',
+      sidebarCollapsed ? 'w-18' : 'w-64',
       'transform', // Add transform for mobile
       // Mobile: hide by default, show when not collapsed
       'md:translate-x-0', // Always visible on desktop
@@ -37,7 +38,10 @@ const sidebarCollapsed = inject("sidebarCollapsed", ref(false));
           :title="sidebarCollapsed ? 'Add Transaction' : ''"
         >
           <PlusIcon
-            class="w-5 h-5 text-gray-400 group-hover:text-white transition-colors"
+            :class="[
+              sidebarCollapsed ? 'w-14 h-5' : 'w-5 h-5',
+              'text-gray-400 group-hover:text-white transition-colors',
+            ]"
           />
           <span
             v-if="!sidebarCollapsed"
@@ -48,13 +52,34 @@ const sidebarCollapsed = inject("sidebarCollapsed", ref(false));
         </router-link>
 
         <router-link
+          to="/history"
+          class="flex items-center p-3 text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white transition-colors group"
+          :class="sidebarCollapsed ? 'justify-center' : ''"
+          :title="sidebarCollapsed ? 'Transaction History' : ''"
+        >
+          <ClockIcon :class="[
+              sidebarCollapsed ? 'w-14 h-5' : 'w-5 h-5',
+              'text-gray-400 group-hover:text-white transition-colors'
+          ]"
+          />
+          <span
+            v-if="!sidebarCollapsed"
+            class="ml-3 font-medium transition-opacity duration-300"
+          >
+            Transaction History
+          </span>
+        </router-link>
+
+        <router-link
           to="/summary"
           class="flex items-center p-3 text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white transition-colors group"
           :class="sidebarCollapsed ? 'justify-center' : ''"
           :title="sidebarCollapsed ? 'Summary' : ''"
         >
-          <ChartBarIcon
-            class="w-5 h-5 text-gray-400 group-hover:text-white transition-colors"
+          <ChartBarIcon :class="[
+              sidebarCollapsed ? 'w-14 h-5' : 'w-5 h-5',
+              'text-gray-400 group-hover:text-white transition-colors'
+          ]"
           />
           <span
             v-if="!sidebarCollapsed"
@@ -70,8 +95,10 @@ const sidebarCollapsed = inject("sidebarCollapsed", ref(false));
           :class="sidebarCollapsed ? 'justify-center' : ''"
           :title="sidebarCollapsed ? 'Edit Categories' : ''"
         >
-          <TagIcon
-            class="w-5 h-5 text-gray-400 group-hover:text-white transition-colors"
+          <TagIcon :class="[
+              sidebarCollapsed ? 'w-14 h-5' : 'w-5 h-5',
+              'text-gray-400 group-hover:text-white transition-colors'
+          ]"
           />
           <span
             v-if="!sidebarCollapsed"
@@ -80,27 +107,9 @@ const sidebarCollapsed = inject("sidebarCollapsed", ref(false));
             Edit Categories
           </span>
         </router-link>
+        
       </nav>
 
-      <!-- Logout Button (Bottom) -->
-      <div class="absolute bottom-6 left-4 right-4">
-        <button
-          @click="logout"
-          class="flex items-center w-full p-3 text-red-400 rounded-lg hover:bg-red-900/20 hover:text-red-300 hover:cursor-pointer transition-colors group"
-          :class="sidebarCollapsed ? 'justify-center' : ''"
-          :title="sidebarCollapsed ? 'Logout' : ''"
-        >
-          <ArrowRightEndOnRectangleIcon
-            class="w-5 h-5 text-red-500 group-hover:text-red-400 transition-colors"
-          />
-          <span
-            v-if="!sidebarCollapsed"
-            class="ml-3 font-medium transition-opacity duration-300"
-          >
-            Logout
-          </span>
-        </button>
-      </div>
     </div>
   </aside>
 </template>
