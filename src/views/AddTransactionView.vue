@@ -12,7 +12,7 @@ import { PlusIcon, XMarkIcon } from "@heroicons/vue/24/outline";
 import { getCategoryByType } from "../lib/data";
 import { useUserData } from "../composables/useData";
 
-const { user } = useUserData();
+const { user, isLoggedIn } = useUserData();
 
 const form = ref({
   amount: "",
@@ -93,6 +93,7 @@ const clearForm = () => {
 
     <!-- Form Card -->
     <div
+      v-if="isLoggedIn"
       class="bg-gray-900 rounded-lg shadow-lg mt-6 p-6 border border-gray-800"
     >
       <form @submit.prevent="submitTransaction" class="space-y-6">
@@ -184,6 +185,7 @@ const clearForm = () => {
 
     <!-- Recent Transactions Preview -->
     <div
+      v-if="isLoggedIn"
       class="mt-8 bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
     >
       <h3 class="text-lg font-semibold text-gray-200 mb-4">
@@ -217,6 +219,15 @@ const clearForm = () => {
           </div>
           <span class="text-red-400 font-semibold">-Rp 4.500</span>
         </div>
+      </div>
+    </div>
+
+    <div
+      v-if="!isLoggedIn"
+      class="bg-gray-900 rounded-lg p-8 mt-6 text-center border border-gray-800"
+    >
+      <div class="text-gray-400 text-lg">
+        Please log in to view your transaction history.
       </div>
     </div>
   </AppLayout>

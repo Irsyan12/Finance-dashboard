@@ -1,9 +1,10 @@
 <script setup>
 import AppLayout from "../components/AppLayout.vue";
 import { ref, computed } from "vue";
-import { categoriesData } from "@/lib/data";
+import { categoriesData, transactions } from "@/lib/data";
 import { useUserData } from "../composables/useData";
 import Header from "../components/View/Header.vue";
+import { useTransactions } from "../composables/useFinance";
 
 import {
   PlusIcon,
@@ -14,7 +15,8 @@ import {
   CheckIcon,
 } from "@heroicons/vue/24/outline";
 
-const { userData, user, isLoggedIn } = useUserData();
+const { getTransactionByUserId } = useTransactions();
+const { user, isLoggedIn } = useUserData();
 const categoriesComputed = computed(() => [...categoriesData]);
 const Allcategories = ref([...categoriesComputed.value]);
 
@@ -23,7 +25,6 @@ const categories = computed(() =>
   Allcategories.value.filter((c) => c.user_id === user.value?.id)
 );
 
-console.log(user.value?.id);
 
 const isAddingCategory = ref(false);
 const editingCategory = ref(null);
@@ -127,6 +128,49 @@ const expenseCategories = computed(() =>
 const incomeCategories = computed(() =>
   categories.value.filter((c) => c.type === "income")
 );
+
+// Get user transactions
+const userTransactions = computed(() => {
+  if (!user.value?.id) return [];
+  return getTransactionByUserId(user.value.id);
+});
+
+// Calculate category usage statistics
+const categoryUsageStats = computed(() => {
+  const usageMap = {};
+  const totalTransactions = userTransactions.value.length;
+
+  // Initialize all user categories with 0 count
+  categories.value.forEach((category) => {
+    usageMap[category.id] = {
+      id: category.id,
+      name: category.name,
+      color: category.color,
+      type: category.type,
+      count: 0,
+      percentage: 0,
+    };
+  });
+
+  // Count transactions per category
+  userTransactions.value.forEach((transaction) => {
+    if (usageMap[transaction.category_id]) {
+      usageMap[transaction.category_id].count++;
+    }
+  });
+
+  // Calculate percentages and convert to array
+  const statsArray = Object.values(usageMap).map((stat) => ({
+    ...stat,
+    percentage:
+      totalTransactions > 0 ? (stat.count / totalTransactions) * 100 : 0,
+  }));
+
+  // Sort by count (most used first) and filter out unused categories
+  return statsArray
+    .filter((stat) => stat.count > 0)
+    .sort((a, b) => b.count - a.count);
+});
 </script>
 
 <template>
@@ -139,7 +183,10 @@ const incomeCategories = computed(() =>
       />
 
       <!-- Add New Category -->
-      <div class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800">
+      <div
+        v-if="isLoggedIn"
+        class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
+      >
         <div v-if="!isAddingCategory" class="flex items-center justify-between">
           <h3 class="text-lg font-semibold text-gray-200">Categories</h3>
           <button
@@ -421,47 +468,60 @@ const incomeCategories = computed(() =>
         class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
       >
         <h3 class="text-lg font-semibold text-gray-200 mb-4">Category Usage</h3>
-        <div class="space-y-3">
+
+        <div v-if="categoryUsageStats.length === 0" class="text-center py-8">
+          <p class="text-gray-400">
+            No transaction data available for category usage statistics.
+          </p>
+        </div>
+
+        <div v-else class="space-y-3">
           <div
-            class="flex justify-between items-center py-2 border-b border-gray-800"
+            v-for="stat in categoryUsageStats"
+            :key="stat.id"
+            class="flex justify-between items-center py-2 border-b border-gray-800 last:border-b-0"
           >
-            <span class="text-gray-300">Food & Dining</span>
+            <div class="flex items-center space-x-3">
+              <div
+                :style="{ backgroundColor: stat.color }"
+                class="w-3 h-3 rounded-full"
+              ></div>
+              <span class="text-gray-300">{{ stat.name }}</span>
+              <span
+                :class="[
+                  'text-xs px-2 py-1 rounded-full',
+                  stat.type === 'income'
+                    ? 'bg-green-900/30 text-green-400'
+                    : 'bg-red-900/30 text-red-400',
+                ]"
+              >
+                {{ stat.type }}
+              </span>
+            </div>
             <div class="flex items-center space-x-2">
               <div class="w-20 bg-gray-700 rounded-full h-2">
                 <div
-                  class="bg-red-500 h-2 rounded-full"
-                  style="width: 80%"
+                  :style="{
+                    backgroundColor: stat.color,
+                    width: `${Math.max(stat.percentage, 5)}%`,
+                  }"
+                  class="h-2 rounded-full transition-all duration-300"
                 ></div>
               </div>
-              <span class="text-sm text-gray-400">24 transactions</span>
+              <span class="text-sm text-gray-400 w-20 text-right">
+                {{ stat.count }} transaction{{ stat.count === 1 ? "" : "s" }}
+              </span>
             </div>
           </div>
-          <div
-            class="flex justify-between items-center py-2 border-b border-gray-800"
-          >
-            <span class="text-gray-300">Transportation</span>
-            <div class="flex items-center space-x-2">
-              <div class="w-20 bg-gray-700 rounded-full h-2">
-                <div
-                  class="bg-blue-500 h-2 rounded-full"
-                  style="width: 60%"
-                ></div>
-              </div>
-              <span class="text-sm text-gray-400">18 transactions</span>
-            </div>
-          </div>
-          <div class="flex justify-between items-center py-2">
-            <span class="text-gray-300">Salary</span>
-            <div class="flex items-center space-x-2">
-              <div class="w-20 bg-gray-700 rounded-full h-2">
-                <div
-                  class="bg-green-500 h-2 rounded-full"
-                  style="width: 40%"
-                ></div>
-              </div>
-              <span class="text-sm text-gray-400">12 transactions</span>
-            </div>
-          </div>
+        </div>
+      </div>
+
+      <div
+        v-if="!isLoggedIn"
+        class="bg-gray-900 rounded-lg p-8 mt-6 text-center border border-gray-800"
+      >
+        <div class="text-gray-400 text-lg">
+          Please log in to view your transaction history.
         </div>
       </div>
     </div>

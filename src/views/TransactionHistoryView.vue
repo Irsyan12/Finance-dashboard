@@ -1,9 +1,11 @@
 <script setup>
 import AppLayout from "../components/AppLayout.vue";
 import { ref, computed, onMounted } from "vue";
-import { transactions, categoriesData } from "@/lib/data";
+import { transactions, categoriesData, formatCurrency } from "@/lib/data";
 import { useUserData } from "../composables/useData";
+import { useCategories } from "../composables/useFinance";
 import Header from "../components/View/Header.vue";
+import AlertDialog from "@/components/ui/AlertDialog.vue";
 import {
   FunnelIcon,
   XMarkIcon,
@@ -12,13 +14,23 @@ import {
   BanknotesIcon,
   ChevronDownIcon,
   MagnifyingGlassIcon,
+  PencilIcon,
+  TrashIcon,
 } from "@heroicons/vue/24/outline";
 
 const { userData, user, isLoggedIn } = useUserData();
+const { getCategoryById } = useCategories();
+
+// Delete dialog state
+const deleteDialog = ref({
+  isOpen: false,
+  transactionId: null,
+  transactionDescription: "",
+});
 
 // Filter states
 const filters = ref({
-  type: "all", // 'all', 'income', 'expense'
+  type: "all",
   category: "all",
   dateRange: "all", // 'all', 'today', 'week', 'month', 'custom'
   customDateFrom: "",
@@ -27,6 +39,30 @@ const filters = ref({
   maxAmount: "",
   searchText: "",
 });
+
+const deleteTransaction = (transactionId) => {
+  const transaction = filteredTransactions.value.find(
+    (t) => t.id === transactionId
+  );
+  deleteDialog.value = {
+    isOpen: true,
+    transactionId: transactionId,
+    transactionDescription: transaction?.description || "No description",
+  };
+};
+
+const confirmDelete = () => {
+  console.log(
+    "Deleting transaction with ID:",
+    deleteDialog.value.transactionId
+  );
+  // TODO: Implement actual delete logic here
+  deleteDialog.value.isOpen = false;
+};
+
+const cancelDelete = () => {
+  deleteDialog.value.isOpen = false;
+};
 
 const showFilters = ref(false);
 
@@ -41,11 +77,6 @@ const userCategories = computed(() => {
   if (!user.value?.id) return [];
   return categoriesData.filter((c) => c.user_id === user.value.id);
 });
-
-// Get category by ID
-const getCategoryById = (categoryId) => {
-  return userCategories.value.find((c) => c.id === categoryId);
-};
 
 // Filter transactions
 const filteredTransactions = computed(() => {
@@ -167,9 +198,7 @@ const summary = computed(() => {
   <AppLayout>
     <div class="space-y-6">
       <!-- Header -->
-      <div
-        class="flex flex-col md:flex-row md:items-center md:justify-between"
-      >
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between">
         <Header
           title="Transaction History"
           subtitle="Review and manage your past transactions"
@@ -346,13 +375,13 @@ const summary = computed(() => {
         <div class="bg-gray-900 rounded-lg p-4 border border-gray-800">
           <div class="text-sm text-gray-400 mb-1">Total Income</div>
           <div class="text-2xl font-bold text-green-400">
-            +Rp {{ summary.income.toLocaleString("id-ID") }}
+            +{{ formatCurrency(summary.income) }}
           </div>
         </div>
         <div class="bg-gray-900 rounded-lg p-4 border border-gray-800">
           <div class="text-sm text-gray-400 mb-1">Total Expense</div>
           <div class="text-2xl font-bold text-red-400">
-            -Rp {{ summary.expense.toLocaleString("id-ID") }}
+            -{{ formatCurrency(summary.expense) }}
           </div>
         </div>
         <div class="bg-gray-900 rounded-lg p-4 border border-gray-800">
@@ -363,8 +392,8 @@ const summary = computed(() => {
               summary.balance >= 0 ? 'text-green-400' : 'text-red-400',
             ]"
           >
-            {{ summary.balance >= 0 ? "+" : "" }}Rp
-            {{ summary.balance.toLocaleString("id-ID") }}
+            {{ summary.balance >= 0 ? "+" : ""
+            }}{{ formatCurrency(summary.balance) }}
           </div>
         </div>
       </div>
@@ -415,9 +444,19 @@ const summary = computed(() => {
 
               <!-- Transaction Details -->
               <div>
-                <h3 class="text-lg font-semibold text-gray-200 mb-1">
-                  {{ transaction.description || "No description" }}
-                </h3>
+                <div class="flex items-center space-x-2">
+                  <h3 class="text-lg font-semibold text-gray-200 mb-1">
+                    {{ transaction.description || "No description" }}
+                  </h3>
+                  <PencilIcon
+                    class="w-4 h-4 inline mr-3 text-gray-300 cursor-pointer hover:text-gray-400"
+                  />
+                  <button @click="deleteTransaction(transaction.id)">
+                    <TrashIcon
+                      class="w-4 h-4 inline text-red-500 hover:text-red-700 cursor-pointer"
+                    />
+                  </button>
+                </div>
                 <div class="flex items-center space-x-4 text-sm text-gray-400">
                   <span class="flex items-center">
                     <CalendarDaysIcon class="w-4 h-4 mr-1" />
@@ -450,8 +489,8 @@ const summary = computed(() => {
                     : 'text-red-400',
                 ]"
               >
-                {{ transaction.type === "income" ? "+" : "-" }}Rp
-                {{ transaction.amount.toLocaleString("id-ID") }}
+                {{ transaction.type === "income" ? "+" : "-" }}
+                {{ formatCurrency(transaction.amount) }}
               </div>
               <div class="text-sm text-gray-400 capitalize">
                 {{ transaction.type }}
@@ -467,5 +506,18 @@ const summary = computed(() => {
         </div>
       </div>
     </div>
+
+    <!-- Delete Confirmation Dialog -->
+    <AlertDialog
+      :isOpen="deleteDialog.isOpen"
+      title="Delete Transaction"
+      :description="`Are you sure you want to delete this transaction: '${deleteDialog.transactionDescription}'? This action cannot be undone.`"
+      confirmText="Delete"
+      cancelText="Cancel"
+      variant="destructive"
+      @confirm="confirmDelete"
+      @cancel="cancelDelete"
+      @close="cancelDelete"
+    />
   </AppLayout>
 </template>

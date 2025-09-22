@@ -1,15 +1,28 @@
 <script setup>
 import Navbar from "../components/Navbar.vue";
 import Sidebar from "../components/Sidebar.vue";
-import { ref, provide } from "vue";
+import { ref, provide, onMounted } from "vue";
 
-// State untuk sidebar collapse
+// State untuk sidebar collapse dengan persistensi localStorage
 const sidebarCollapsed = ref(false);
+
+// Load state dari localStorage saat component mounted
+onMounted(() => {
+  const savedState = localStorage.getItem("sidebarCollapsed");
+  if (savedState !== null) {
+    sidebarCollapsed.value = JSON.parse(savedState);
+  }
+});
 
 // Provide state ke child components
 provide("sidebarCollapsed", sidebarCollapsed);
 provide("toggleSidebar", () => {
   sidebarCollapsed.value = !sidebarCollapsed.value;
+  // Simpan state ke localStorage
+  localStorage.setItem(
+    "sidebarCollapsed",
+    JSON.stringify(sidebarCollapsed.value)
+  );
 });
 </script>
 

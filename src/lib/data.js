@@ -324,14 +324,6 @@ export const getTransactionsByType = (type) => {
   return transactions.filter((t) => t.type === type);
 };
 
-export const getTransactionsByUser = (userId) => {
-  return transactions.filter((t) => t.user_id === userId);
-};
-
-export const getTransactionsByCategory = (categoryName) => {
-  return transactions.filter((t) => t.category === categoryName);
-};
-
 export const getTotalByType = (type) => {
   return getTransactionsByType(type).reduce((sum, t) => sum + t.amount, 0);
 };
@@ -394,12 +386,7 @@ export const getSummaryStats = () => {
 
 // Format currency untuk display
 export const formatCurrency = (amount) => {
-  return `Rp ${amount.toLocaleString("id-ID")}`;
-};
-
-// Get category by ID
-export const getCategoryById = (id) => {
-  return categoriesData.find((c) => c.id === id);
+  return `Rp. ${amount.toLocaleString("id-ID")}`;
 };
 
 export const getCategoryByUser = (userId) => {
@@ -407,12 +394,5 @@ export const getCategoryByUser = (userId) => {
 };
 
 export const getCategoryByType = (type, userId) => {
-  getCategoryByUser(userId);
   return categoriesData.filter((c) => c.type === type && c.user_id === userId);
-};
-
-// Get category color
-export const getCategoryColor = (categoryName) => {
-  const category = categoriesData.find((c) => c.name === categoryName);
-  return category ? category.color : "#6b7280";
 };

@@ -8,8 +8,10 @@ import {
 } from "@heroicons/vue/24/outline";
 import { useAuth } from "../composables/useAuth";
 import { ref, inject } from "vue";
+import { useRoute } from "vue-router";
 
 const { logout } = useAuth();
+const route = useRoute();
 
 // Try to get state from layout, fallback to local state
 const sidebarCollapsed = inject("sidebarCollapsed", ref(false));
@@ -33,14 +35,21 @@ const sidebarCollapsed = inject("sidebarCollapsed", ref(false));
       <nav class="space-y-2">
         <router-link
           to="/addtransaction"
-          class="flex items-center p-3 text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white transition-colors group"
-          :class="sidebarCollapsed ? 'justify-center' : ''"
+          :class="[
+            'flex items-center p-3 rounded-lg transition-colors group',
+            sidebarCollapsed ? 'justify-center' : '',
+            route.path === '/addtransaction'
+              ? 'bg-blue-600 text-white'
+              : 'text-gray-300 hover:bg-gray-800 hover:text-white',
+          ]"
           :title="sidebarCollapsed ? 'Add Transaction' : ''"
         >
           <PlusIcon
             :class="[
               sidebarCollapsed ? 'w-14 h-5' : 'w-5 h-5',
-              'text-gray-400 group-hover:text-white transition-colors',
+              route.path === '/addtransaction'
+                ? 'text-white'
+                : 'text-gray-400 group-hover:text-white transition-colors',
             ]"
           />
           <span
@@ -53,14 +62,22 @@ const sidebarCollapsed = inject("sidebarCollapsed", ref(false));
 
         <router-link
           to="/history"
-          class="flex items-center p-3 text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white transition-colors group"
-          :class="sidebarCollapsed ? 'justify-center' : ''"
+          :class="[
+            'flex items-center p-3 rounded-lg transition-colors group',
+            sidebarCollapsed ? 'justify-center' : '',
+            route.path === '/history'
+              ? 'bg-blue-600 text-white'
+              : 'text-gray-300 hover:bg-gray-800 hover:text-white',
+          ]"
           :title="sidebarCollapsed ? 'Transaction History' : ''"
         >
-          <ClockIcon :class="[
+          <ClockIcon
+            :class="[
               sidebarCollapsed ? 'w-14 h-5' : 'w-5 h-5',
-              'text-gray-400 group-hover:text-white transition-colors'
-          ]"
+              route.path === '/history'
+                ? 'text-white'
+                : 'text-gray-400 group-hover:text-white transition-colors',
+            ]"
           />
           <span
             v-if="!sidebarCollapsed"
@@ -72,14 +89,22 @@ const sidebarCollapsed = inject("sidebarCollapsed", ref(false));
 
         <router-link
           to="/summary"
-          class="flex items-center p-3 text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white transition-colors group"
-          :class="sidebarCollapsed ? 'justify-center' : ''"
+          :class="[
+            'flex items-center p-3 rounded-lg transition-colors group',
+            sidebarCollapsed ? 'justify-center' : '',
+            route.path === '/summary'
+              ? 'bg-blue-600 text-white'
+              : 'text-gray-300 hover:bg-gray-800 hover:text-white',
+          ]"
           :title="sidebarCollapsed ? 'Summary' : ''"
         >
-          <ChartBarIcon :class="[
+          <ChartBarIcon
+            :class="[
               sidebarCollapsed ? 'w-14 h-5' : 'w-5 h-5',
-              'text-gray-400 group-hover:text-white transition-colors'
-          ]"
+              route.path === '/summary'
+                ? 'text-white'
+                : 'text-gray-400 group-hover:text-white transition-colors',
+            ]"
           />
           <span
             v-if="!sidebarCollapsed"
@@ -91,14 +116,22 @@ const sidebarCollapsed = inject("sidebarCollapsed", ref(false));
 
         <router-link
           to="/editcategories"
-          class="flex items-center p-3 text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white transition-colors group"
-          :class="sidebarCollapsed ? 'justify-center' : ''"
+          :class="[
+            'flex items-center p-3 rounded-lg transition-colors group',
+            sidebarCollapsed ? 'justify-center' : '',
+            route.path === '/editcategories'
+              ? 'bg-blue-600 text-white'
+              : 'text-gray-300 hover:bg-gray-800 hover:text-white',
+          ]"
           :title="sidebarCollapsed ? 'Edit Categories' : ''"
         >
-          <TagIcon :class="[
+          <TagIcon
+            :class="[
               sidebarCollapsed ? 'w-14 h-5' : 'w-5 h-5',
-              'text-gray-400 group-hover:text-white transition-colors'
-          ]"
+              route.path === '/editcategories'
+                ? 'text-white'
+                : 'text-gray-400 group-hover:text-white transition-colors',
+            ]"
           />
           <span
             v-if="!sidebarCollapsed"
@@ -107,9 +140,7 @@ const sidebarCollapsed = inject("sidebarCollapsed", ref(false));
             Edit Categories
           </span>
         </router-link>
-        
       </nav>
-
     </div>
   </aside>
 </template>

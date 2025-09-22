@@ -143,7 +143,7 @@ const handleKeydown = (event) => {
     <div
       class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"
     >
-      {{ currency === "IDR" ? "Rp" : currency }}
+      {{ currency === "IDR" ? "Rp." : currency }}
     </div>
   </div>
 </template>

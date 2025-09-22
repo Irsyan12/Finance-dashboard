@@ -1,15 +1,15 @@
 import { ref, computed } from "vue";
 import {
   transactions as rawTransactions,
-  categories as rawCategories,
-  getTransactionsByType,
+  categoriesData as rawCategories,
   getTotalByType,
   getExpensesByCategory,
   getIncomeByCategory,
   getRecentTransactions,
   getSummaryStats,
   formatCurrency,
-} from "@/lib/data";
+} from "../lib/data";
+
 
 // Composable untuk data transaksi
 export const useTransactions = () => {
@@ -60,6 +60,10 @@ export const useTransactions = () => {
     return transactions.value.find((t) => t.id === id);
   };
 
+  const getTransactionByUserId = (userId) => {
+    return transactions.value.filter((t) => t.user_id === userId);
+  };
+
   return {
     // Data
     transactions,
@@ -81,6 +85,7 @@ export const useTransactions = () => {
     deleteTransaction,
     getTransactionById,
     formatCurrency,
+    getTransactionByUserId,
   };
 };
 

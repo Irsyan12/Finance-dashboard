@@ -9,78 +9,34 @@ import {
   CurrencyDollarIcon,
 } from "@heroicons/vue/24/outline";
 import Header from "../components/View/Header.vue";
+import { formatCurrency } from "@/lib/data";
+import { useTransactions, useCategories } from "@/composables/useFinance";
+import { useUserData } from "../composables/useData";
 
-// Sample data
-const transactions = ref([
-  {
-    id: 1,
-    type: "income",
-    amount: 4200000,
-    category: "Salary",
-    date: "2024-01-01",
-    description: "Monthly Salary",
-  },
-  {
-    id: 2,
-    type: "expense",
-    amount: 125500,
-    category: "Food & Dining",
-    date: "2024-01-02",
-    description: "Grocery Shopping",
-  },
-  {
-    id: 3,
-    type: "expense",
-    amount: 4500,
-    category: "Food & Dining",
-    date: "2024-01-02",
-    description: "Coffee Shop",
-  },
-  {
-    id: 4,
-    type: "expense",
-    amount: 800000,
-    category: "Bills & Utilities",
-    date: "2024-01-03",
-    description: "Electricity Bill",
-  },
-  {
-    id: 5,
-    type: "income",
-    amount: 200000,
-    category: "Freelancing",
-    date: "2024-01-03",
-    description: "Web Design Project",
-  },
-  {
-    id: 6,
-    type: "expense",
-    amount: 60000,
-    category: "Transportation",
-    date: "2024-01-04",
-    description: "Gas",
-  },
-  {
-    id: 7,
-    type: "expense",
-    amount: 25000,
-    category: "Entertainment",
-    date: "2024-01-05",
-    description: "Movie Tickets",
-  },
-]);
+const { user, isLoggedIn } = useUserData();
+const { getTransactionByUserId } = useTransactions();
+const { getCategoryById } = useCategories();
+
+const transactions = ref([]);
+
+// Load user transactions when user is available
+const userTransactions = computed(() => {
+  if (!user.value?.id) return [];
+  return getTransactionByUserId(user.value.id);
+});
+
 
 const selectedPeriod = ref("month");
 
 // Computed values
 const totalIncome = computed(() => {
-  return transactions.value
+  return userTransactions.value
     .filter((t) => t.type === "income")
     .reduce((sum, t) => sum + t.amount, 0);
 });
 
 const totalExpenses = computed(() => {
-  return transactions.value
+  return userTransactions.value
     .filter((t) => t.type === "expense")
     .reduce((sum, t) => sum + t.amount, 0);
 });
@@ -89,10 +45,12 @@ const balance = computed(() => totalIncome.value - totalExpenses.value);
 
 const expensesByCategory = computed(() => {
   const categories = {};
-  transactions.value
+  userTransactions.value
     .filter((t) => t.type === "expense")
     .forEach((t) => {
-      categories[t.category] = (categories[t.category] || 0) + t.amount;
+      const category = getCategoryById(t.category_id);
+      const categoryName = category?.name || "Unknown Category";
+      categories[categoryName] = (categories[categoryName] || 0) + t.amount;
     });
   return Object.entries(categories)
     .map(([name, amount]) => ({ name, amount }))
@@ -101,10 +59,12 @@ const expensesByCategory = computed(() => {
 
 const incomeByCategory = computed(() => {
   const categories = {};
-  transactions.value
+  userTransactions.value
     .filter((t) => t.type === "income")
     .forEach((t) => {
-      categories[t.category] = (categories[t.category] || 0) + t.amount;
+      const category = getCategoryById(t.category_id);
+      const categoryName = category?.name || "Unknown Category";
+      categories[categoryName] = (categories[categoryName] || 0) + t.amount;
     });
   return Object.entries(categories)
     .map(([name, amount]) => ({ name, amount }))
@@ -122,7 +82,10 @@ const savingsRate = computed(() => {
     <div class="space-y-6">
       <!-- Header -->
       <div class="flex justify-between items-center">
-        <Header title="Financial Summary" subtitle="Overview of your finances" />
+        <Header
+          title="Financial Summary"
+          subtitle="Overview of your finances"
+        />
 
         <!-- Period Selector -->
         <div class="flex items-center space-x-2">
@@ -138,9 +101,9 @@ const savingsRate = computed(() => {
           </select>
         </div>
       </div>
-
+      <div></div>
       <!-- Summary Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div v-if="isLoggedIn" class="grid grid-cols-1 md:grid-cols-4 gap-6">
         <!-- Total Income -->
         <div
           class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
@@ -149,7 +112,7 @@ const savingsRate = computed(() => {
             <div>
               <p class="text-sm text-gray-400 mb-1">Total Income</p>
               <p class="text-2xl font-bold text-green-400">
-                Rp {{ totalIncome.toLocaleString("id-ID") }}
+                {{ formatCurrency(totalIncome) }}
               </p>
             </div>
             <div class="p-3 bg-green-900/20 rounded-full">
@@ -166,7 +129,7 @@ const savingsRate = computed(() => {
             <div>
               <p class="text-sm text-gray-400 mb-1">Total Expenses</p>
               <p class="text-2xl font-bold text-red-400">
-                Rp {{ totalExpenses.toLocaleString("id-ID") }}
+                {{ formatCurrency(totalExpenses) }}
               </p>
             </div>
             <div class="p-3 bg-red-900/20 rounded-full">
@@ -186,7 +149,7 @@ const savingsRate = computed(() => {
                 class="text-2xl font-bold"
                 :class="balance >= 0 ? 'text-blue-400' : 'text-red-400'"
               >
-                Rp. <span>{{ balance.toLocaleString("id-ID") }}</span>
+                <span>{{ formatCurrency(balance) }}</span>
               </p>
             </div>
             <div class="p-3 bg-blue-900/20 rounded-full">
@@ -214,7 +177,7 @@ const savingsRate = computed(() => {
       </div>
 
       <!-- Charts and Breakdowns -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div v-if="isLoggedIn" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Expenses by Category -->
         <div
           class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
@@ -238,12 +201,9 @@ const savingsRate = computed(() => {
                     }"
                   ></div>
                 </div>
-                <span class="text-red-400 font-semibold w-22 text-right"
-                  >Rp.
-                  <span>{{
-                    category.amount.toLocaleString("id-ID")
-                  }}</span></span
-                >
+                <span class="text-red-400 font-semibold w-22 text-right">{{
+                  formatCurrency(category.amount)
+                }}</span>
               </div>
             </div>
           </div>
@@ -272,11 +232,8 @@ const savingsRate = computed(() => {
                     }"
                   ></div>
                 </div>
-                <span class="text-green-400 font-semibold w-22 text-right"
-                  >Rp.
-                  <span>{{
-                    category.amount.toLocaleString("id-ID")
-                  }}</span></span
+                <span class="text-green-400 font-semibold w-22 text-right">
+                  <span>{{ formatCurrency(category.amount) }}</span></span
                 >
               </div>
             </div>
@@ -285,13 +242,16 @@ const savingsRate = computed(() => {
       </div>
 
       <!-- Recent Transactions -->
-      <div class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800">
+      <div
+        v-if="isLoggedIn"
+        class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
+      >
         <h3 class="text-lg font-semibold text-gray-200 mb-4">
           Recent Transactions
         </h3>
         <div class="space-y-3">
           <div
-            v-for="transaction in transactions.slice(0, 5)"
+            v-for="transaction in userTransactions.slice(0, 5)"
             :key="transaction.id"
             class="flex justify-between items-center py-3 border-b border-gray-800 last:border-b-0"
           >
@@ -315,7 +275,11 @@ const savingsRate = computed(() => {
                   {{ transaction.description }}
                 </p>
                 <p class="text-sm text-gray-500">
-                  {{ transaction.category }} • {{ transaction.date }}
+                  {{
+                    getCategoryById(transaction.category_id)?.name ||
+                    "Unknown Category"
+                  }}
+                  • {{ transaction.date }}
                 </p>
               </div>
             </div>
@@ -327,15 +291,18 @@ const savingsRate = computed(() => {
                   : 'text-red-400',
               ]"
             >
-              {{ transaction.type === "income" ? "+" : "-" }}Rp
-              {{ transaction.amount.toLocaleString("id-ID") }}
+              {{ transaction.type === "income" ? "+" : "-"
+              }}{{ formatCurrency(transaction.amount) }}
             </span>
           </div>
         </div>
       </div>
 
       <!-- Insights -->
-      <div class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800">
+      <div
+        v-if="isLoggedIn"
+        class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
+      >
         <h3 class="text-lg font-semibold text-gray-200 mb-4">
           Financial Insights
         </h3>
@@ -345,8 +312,8 @@ const savingsRate = computed(() => {
               Top Spending Category
             </h4>
             <p class="text-gray-300">
-              {{ expensesByCategory[0]?.name || "No expenses" }} - Rp
-              {{ expensesByCategory[0]?.amount.toLocaleString("id-ID") || "0" }}
+              {{ expensesByCategory[0]?.name || "No expenses" }} -
+              {{ formatCurrency(expensesByCategory[0]?.amount) || "0" }}
             </p>
           </div>
           <div class="p-4 bg-green-900/20 rounded-lg border border-green-800">
@@ -354,10 +321,19 @@ const savingsRate = computed(() => {
               Primary Income Source
             </h4>
             <p class="text-gray-300">
-              {{ incomeByCategory[0]?.name || "No income" }} - Rp
-              {{ incomeByCategory[0]?.amount.toLocaleString("id-ID") || "0" }}
+              {{ incomeByCategory[0]?.name || "No income" }} -
+              {{ formatCurrency(incomeByCategory[0]?.amount) || "0" }}
             </p>
           </div>
+        </div>
+      </div>
+
+      <div
+        v-if="!isLoggedIn"
+        class="bg-gray-900 rounded-lg p-8 mt-6 text-center border border-gray-800"
+      >
+        <div class="text-gray-400 text-lg">
+          Please log in to view your transaction history.
         </div>
       </div>
     </div>
