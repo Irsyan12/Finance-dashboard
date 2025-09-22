@@ -29,12 +29,16 @@ provide("toggleSidebar", () => {
 <template>
   <div class="min-h-screen bg-gray-950">
     <!-- Navbar -->
-    <Navbar />
+    <keep-alive>
+      <Navbar />
+    </keep-alive>
 
     <!-- Main Content Area -->
     <div class="flex">
       <!-- Sidebar -->
-      <Sidebar />
+      <keep-alive>
+        <Sidebar />
+      </keep-alive>
 
       <!-- Main Content -->
       <main

@@ -2,10 +2,12 @@
 import AppLayout from "../components/AppLayout.vue";
 import { computed } from "vue";
 import { useAuthStore } from "../stores/auth";
+import { useUserData } from "../composables/useData";
+
+const { userData, isLoggedIn } = useUserData();
 
 const auth = useAuthStore();
 auth.fetchUser();
-const userData = computed(() => auth.user?.user_metadata);
 </script>
 
 <template>
@@ -14,7 +16,7 @@ const userData = computed(() => auth.user?.user_metadata);
     <div class="space-y-6">
       <!-- Welcome Section -->
       <div class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800">
-        <div v-if="auth.user">
+        <div v-if="isLoggedIn">
           <h1 class="text-3xl font-bold text-white mb-2">
             Welcome back, {{ userData?.full_name }}!
           </h1>
@@ -30,7 +32,7 @@ const userData = computed(() => auth.user?.user_metadata);
       </div>
 
       <!-- Dashboard Content Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div v-if="isLoggedIn" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Card 1 -->
         <div
           class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
@@ -66,7 +68,7 @@ const userData = computed(() => auth.user?.user_metadata);
       </div>
 
       <!-- Recent Transactions -->
-      <div class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800">
+      <div v-if="isLoggedIn" class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800">
         <h3 class="text-lg font-semibold text-gray-200 mb-4">
           Recent Transactions
         </h3>

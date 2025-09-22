@@ -1,7 +1,6 @@
 import { supabase } from "../lib/supabase";
 import { ref } from "vue";
 
-// Singleton user, shared across all imports
 import { onMounted } from "vue";
 const user = ref(null);
 

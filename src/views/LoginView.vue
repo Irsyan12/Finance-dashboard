@@ -4,7 +4,18 @@ const { loginWithGoogle } = useAuthStore();
 </script>
 
 <template>
-  <div class="h-screen flex items-center justify-center bg-gray-100">
+  <div
+    class="h-screen flex flex-col space-y-3 items-center justify-center bg-gray-900"
+  >
+    <h2 class="mb-12">
+      <span
+        class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600"
+      >
+        Finance Dashboard
+      </span>
+    </h2>
+    <div class="text-white text-lg">Login to your account</div>
+
     <button
       @click="loginWithGoogle"
       class="px-6 py-3 bg-blue-800 text-white rounded-lg shadow-md hover:cursor-pointer hover:bg-blue-900 hover:shadow-2xl transition"
@@ -18,5 +29,4 @@ const { loginWithGoogle } = useAuthStore();
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

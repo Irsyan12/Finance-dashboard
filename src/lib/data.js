@@ -117,7 +117,7 @@ export const transactions = [
   // Income Transactions
   {
     id: 1,
-    user_id: "50eaed3b-b7c3-4b04-a500-e78f84d09e0d",
+    user_id: "5844d779-cc4f-41b8-880d-523ce4389547",
     type: "income",
     amount: 5500000,
     category_id: 10,
@@ -127,7 +127,7 @@ export const transactions = [
   },
   {
     id: 2,
-    user_id: "50eaed3b-b7c3-4b04-a500-e78f84d09e0d",
+    user_id: "5844d779-cc4f-41b8-880d-523ce4389547",
     type: "income",
     amount: 1200000,
     category_id: 11,
@@ -137,7 +137,7 @@ export const transactions = [
   },
   {
     id: 3,
-    user_id: "50eaed3b-b7c3-4b04-a500-e78f84d09e0d",
+    user_id: "5844d779-cc4f-41b8-880d-523ce4389547",
     type: "income",
     amount: 750000,
     category_id: 12,
@@ -147,7 +147,7 @@ export const transactions = [
   },
   {
     id: 4,
-    user_id: "50eaed3b-b7c3-4b04-a500-e78f84d09e0d",
+    user_id: "5844d779-cc4f-41b8-880d-523ce4389547",
     type: "income",
     amount: 350000,
     category_id: 11,
@@ -159,7 +159,7 @@ export const transactions = [
   // Expense Transactions
   {
     id: 5,
-    user_id: "50eaed3b-b7c3-4b04-a500-e78f84d09e0d",
+    user_id: "5844d779-cc4f-41b8-880d-523ce4389547",
     type: "expense",
     amount: 450000,
     category_id: 1,
@@ -169,7 +169,7 @@ export const transactions = [
   },
   {
     id: 6,
-    user_id: "50eaed3b-b7c3-4b04-a500-e78f84d09e0d",
+    user_id: "5844d779-cc4f-41b8-880d-523ce4389547",
     type: "expense",
     amount: 25000,
     category_id: 1,
@@ -179,7 +179,7 @@ export const transactions = [
   },
   {
     id: 7,
-    user_id: "50eaed3b-b7c3-4b04-a500-e78f84d09e0d",
+    user_id: "5844d779-cc4f-41b8-880d-523ce4389547",
     type: "expense",
     amount: 150000,
     category_id: 2,
@@ -189,7 +189,7 @@ export const transactions = [
   },
   {
     id: 8,
-    user_id: "50eaed3b-b7c3-4b04-a500-e78f84d09e0d",
+    user_id: "5844d779-cc4f-41b8-880d-523ce4389547",
     type: "expense",
     amount: 75000,
     category_id: 2,
@@ -199,7 +199,7 @@ export const transactions = [
   },
   {
     id: 9,
-    user_id: "50eaed3b-b7c3-4b04-a500-e78f84d09e0d",
+    user_id: "5844d779-cc4f-41b8-880d-523ce4389547",
     type: "expense",
     amount: 850000,
     category_id: 5,
@@ -386,7 +386,10 @@ export const getSummaryStats = () => {
 
 // Format currency untuk display
 export const formatCurrency = (amount) => {
-  return `Rp. ${amount.toLocaleString("id-ID")}`;
+  if (amount === null || amount === undefined || isNaN(amount)) {
+    return "Rp 0";
+  }
+  return `Rp ${Number(amount).toLocaleString("id-ID")}`;
 };
 
 export const getCategoryByUser = (userId) => {

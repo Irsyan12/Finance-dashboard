@@ -8,7 +8,9 @@ export const useUserData = () => {
   // Auto fetch user data saat composable dipanggil
   auth.fetchUser();
 
-  const userData = computed(() => auth.user?.user_metadata);
+  const userData = computed(
+    () => auth.user?.raw_user_meta_data || auth.user?.user_metadata || null
+  );
   const user = computed(() => auth.user);
   const isLoggedIn = computed(() => !!auth.user);
 

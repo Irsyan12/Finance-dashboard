@@ -25,32 +25,35 @@ const userTransactions = computed(() => {
   return getTransactionByUserId(user.value.id);
 });
 
-
 const selectedPeriod = ref("month");
 
 // Computed values
 const totalIncome = computed(() => {
+  if (!userTransactions.value.length) return 0;
   return userTransactions.value
     .filter((t) => t.type === "income")
-    .reduce((sum, t) => sum + t.amount, 0);
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
 });
 
 const totalExpenses = computed(() => {
+  if (!userTransactions.value.length) return 0;
   return userTransactions.value
     .filter((t) => t.type === "expense")
-    .reduce((sum, t) => sum + t.amount, 0);
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
 });
 
 const balance = computed(() => totalIncome.value - totalExpenses.value);
 
 const expensesByCategory = computed(() => {
+  if (!userTransactions.value.length) return [];
   const categories = {};
   userTransactions.value
     .filter((t) => t.type === "expense")
     .forEach((t) => {
       const category = getCategoryById(t.category_id);
       const categoryName = category?.name || "Unknown Category";
-      categories[categoryName] = (categories[categoryName] || 0) + t.amount;
+      categories[categoryName] =
+        (categories[categoryName] || 0) + (t.amount || 0);
     });
   return Object.entries(categories)
     .map(([name, amount]) => ({ name, amount }))
@@ -58,13 +61,15 @@ const expensesByCategory = computed(() => {
 });
 
 const incomeByCategory = computed(() => {
+  if (!userTransactions.value.length) return [];
   const categories = {};
   userTransactions.value
     .filter((t) => t.type === "income")
     .forEach((t) => {
       const category = getCategoryById(t.category_id);
       const categoryName = category?.name || "Unknown Category";
-      categories[categoryName] = (categories[categoryName] || 0) + t.amount;
+      categories[categoryName] =
+        (categories[categoryName] || 0) + (t.amount || 0);
     });
   return Object.entries(categories)
     .map(([name, amount]) => ({ name, amount }))
@@ -313,7 +318,7 @@ const savingsRate = computed(() => {
             </h4>
             <p class="text-gray-300">
               {{ expensesByCategory[0]?.name || "No expenses" }} -
-              {{ formatCurrency(expensesByCategory[0]?.amount) || "0" }}
+              {{ formatCurrency(expensesByCategory[0]?.amount || 0) }}
             </p>
           </div>
           <div class="p-4 bg-green-900/20 rounded-lg border border-green-800">
@@ -322,7 +327,7 @@ const savingsRate = computed(() => {
             </h4>
             <p class="text-gray-300">
               {{ incomeByCategory[0]?.name || "No income" }} -
-              {{ formatCurrency(incomeByCategory[0]?.amount) || "0" }}
+              {{ formatCurrency(incomeByCategory[0]?.amount || 0) }}
             </p>
           </div>
         </div>

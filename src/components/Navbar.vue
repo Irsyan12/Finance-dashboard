@@ -1,8 +1,6 @@
 <script setup>
 import { ref, inject } from "vue";
 import {
-  Bars3Icon,
-  XMarkIcon,
   ArrowRightEndOnRectangleIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -51,8 +49,8 @@ const toggleSidebar = () => {
       <div v-if="isLoggedIn" class="flex items-center gap-4">
         <span>Hello, {{ userData?.full_name }}</span>
         <img
-          :src="userData?.avatar_url"
-          alt=""
+          src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
+          alt="user avatar"
           class="w-8 h-8 rounded-full object-cover border border-gray-400"
         />
         <button
@@ -75,11 +73,9 @@ const toggleSidebar = () => {
 
     <!-- Small screen (hamburger menu) -->
     <div class="md:hidden flex items-center">
-      <button
-        @click="isOpen = !isOpen"
-      >
+      <button @click="isOpen = !isOpen">
         <img
-          :src="userData?.avatar_url || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'"
+          src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
           alt=""
           class="w-8 h-8 rounded-full object-cover border border-gray-400"
         />
