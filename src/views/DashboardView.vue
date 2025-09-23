@@ -2,7 +2,7 @@
 import AppLayout from "../components/AppLayout.vue";
 import { computed } from "vue";
 import { useAuthStore } from "../stores/auth";
-import { useUserData } from "../composables/useData";
+import { useUserData } from "../services/composables/useData";
 
 const { userData, isLoggedIn } = useUserData();
 
@@ -32,7 +32,10 @@ auth.fetchUser();
       </div>
 
       <!-- Dashboard Content Grid -->
-      <div v-if="isLoggedIn" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div
+        v-if="isLoggedIn"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      >
         <!-- Card 1 -->
         <div
           class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
@@ -40,8 +43,12 @@ auth.fetchUser();
           <h3 class="text-lg font-semibold text-gray-200 mb-2">
             Total Balance
           </h3>
-          <p class="text-3xl font-bold text-green-400">Rp. <span>12.450.000</span></p>
-          <p class="text-sm text-gray-500 mt-1"><span>+2.5%</span> from last month</p>
+          <p class="text-3xl font-bold text-green-400">
+            Rp. <span>12.450.000</span>
+          </p>
+          <p class="text-sm text-gray-500 mt-1">
+            <span>+2.5%</span> from last month
+          </p>
         </div>
 
         <!-- Card 2 -->
@@ -51,8 +58,12 @@ auth.fetchUser();
           <h3 class="text-lg font-semibold text-gray-200 mb-2">
             Monthly Expenses
           </h3>
-          <p class="text-3xl font-bold text-red-400">Rp. <span>3.240.000</span></p>
-          <p class="text-sm text-gray-500 mt-1"><span>-5.2%</span> from last month</p>
+          <p class="text-3xl font-bold text-red-400">
+            Rp. <span>3.240.000</span>
+          </p>
+          <p class="text-sm text-gray-500 mt-1">
+            <span>-5.2%</span> from last month
+          </p>
         </div>
 
         <!-- Card 3 -->
@@ -62,13 +73,18 @@ auth.fetchUser();
           <h3 class="text-lg font-semibold text-gray-200 mb-2">
             Monthly Income
           </h3>
-          <p class="text-3xl font-bold text-blue-400">Rp. <span>8.500.000</span></p>
+          <p class="text-3xl font-bold text-blue-400">
+            Rp. <span>8.500.000</span>
+          </p>
           <p class="text-sm text-gray-500 mt-1">Same as last month</p>
         </div>
       </div>
 
       <!-- Recent Transactions -->
-      <div v-if="isLoggedIn" class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800">
+      <div
+        v-if="isLoggedIn"
+        class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
+      >
         <h3 class="text-lg font-semibold text-gray-200 mb-4">
           Recent Transactions
         </h3>
@@ -80,7 +96,9 @@ auth.fetchUser();
               <p class="font-medium text-gray-200">Grocery Shopping</p>
               <p class="text-sm text-gray-500">Today, 2:30 PM</p>
             </div>
-            <span class="text-red-400 font-semibold">- Rp. <span>125.500</span></span>
+            <span class="text-red-400 font-semibold"
+              >- Rp. <span>125.500</span></span
+            >
           </div>
           <div
             class="flex justify-between items-center py-2 border-b border-gray-800"
@@ -89,14 +107,18 @@ auth.fetchUser();
               <p class="font-medium text-gray-200">Salary Deposit</p>
               <p class="text-sm text-gray-500">Yesterday, 9:00 AM</p>
             </div>
-            <span class="text-green-400 font-semibold">+ Rp. <span>4.200.000</span></span>
+            <span class="text-green-400 font-semibold"
+              >+ Rp. <span>4.200.000</span></span
+            >
           </div>
           <div class="flex justify-between items-center py-2">
             <div>
               <p class="font-medium text-gray-200">Coffee Shop</p>
               <p class="text-sm text-gray-500">2 days ago, 8:15 AM</p>
             </div>
-            <span class="text-red-400 font-semibold">- Rp. <span>45.000</span></span>
+            <span class="text-red-400 font-semibold"
+              >- Rp. <span>45.000</span></span
+            >
           </div>
         </div>
       </div>

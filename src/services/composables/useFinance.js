@@ -8,11 +8,10 @@ import {
   getRecentTransactions,
   getSummaryStats,
   formatCurrency,
-} from "../lib/data";
+} from "../supabase/data";
 
-
-// Composable untuk data transaksi
-export const useTransactions = () => {
+// Composable untuk data transaksi (static/mock data)
+export const useFinanceData = () => {
   const transactions = ref(rawTransactions);
   const categories = ref(rawCategories);
 
@@ -126,10 +125,6 @@ export const useCategories = () => {
     categories.value = categories.value.filter((c) => c.id !== id);
   };
 
-  const getCategoryById = (id) => {
-    return categories.value.find((c) => c.id === id);
-  };
-
   return {
     categories,
     expenseCategories,
@@ -137,6 +132,5 @@ export const useCategories = () => {
     addCategory,
     updateCategory,
     deleteCategory,
-    getCategoryById,
   };
 };

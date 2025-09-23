@@ -9,13 +9,16 @@ import {
   CurrencyDollarIcon,
 } from "@heroicons/vue/24/outline";
 import Header from "../components/View/Header.vue";
-import { formatCurrency } from "@/lib/data";
-import { useTransactions, useCategories } from "@/composables/useFinance";
-import { useUserData } from "../composables/useData";
+import {
+  formatCurrency,
+  categoriesData,
+  getCategoryById,
+} from "@/services/supabase/data";
+import { useFinanceData } from "@/services/composables/useFinance";
+import { useUserData } from "../services/composables/useData";
 
 const { user, isLoggedIn } = useUserData();
-const { getTransactionByUserId } = useTransactions();
-const { getCategoryById } = useCategories();
+const { getTransactionByUserId } = useFinanceData();
 
 const transactions = ref([]);
 

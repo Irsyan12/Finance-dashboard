@@ -1,12 +1,25 @@
-import { supabase } from "../lib/supabase";
+import { supabase } from "../supabase/supabase";
 import { ref } from "vue";
+import { useUserInitialization } from "./useUserInitialization";
 
 import { onMounted } from "vue";
 const user = ref(null);
+const { initializeNewUser } = useUserInitialization();
 
 // Listen to auth state changes (login/logout)
-supabase.auth.onAuthStateChange((event, session) => {
-  user.value = session?.user || null;
+supabase.auth.onAuthStateChange(async (event, session) => {
+  const newUser = session?.user || null;
+
+  // If user just logged in and it's a new user
+  if (event === "SIGNED_IN" && newUser && !user.value) {
+
+    // Initialize user data in background (non-blocking)
+    initializeNewUser(newUser.id).catch((error) => {
+      console.error("Background user initialization failed:", error);
+    });
+  }
+
+  user.value = newUser;
 });
 
 export function useAuth() {

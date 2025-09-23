@@ -1,12 +1,17 @@
 <script setup>
-import { useAuth } from "./composables/useAuth";
+import { useAuth } from "./services/composables/useAuth";
+import Sonner from "./components/ui/sonner.vue";
+
 const { user, getUser } = useAuth();
 
 getUser();
 </script>
 
 <template>
-  <router-view />
+  <div>
+    <router-view />
+    <Sonner />
+  </div>
 </template>
 
 <style scoped></style>

@@ -5,7 +5,7 @@ export const categoriesData = [
   // Expense Categories
   {
     id: 1,
-    user_id: "50eaed3b-b7c3-4b04-a500-e78f84d09e0d",
+    user_id: "5844d779-cc4f-41b8-880d-523ce4389547",
     name: "Food & Dining",
     type: "expense",
     color: "#ef4444",
@@ -13,56 +13,56 @@ export const categoriesData = [
   },
   {
     id: 2,
-    user_id: "50eaed3b-b7c3-4b04-a500-e78f84d09e0d",
+    user_id: "5844d779-cc4f-41b8-880d-523ce4389547",
     name: "Transportation",
     type: "expense",
     color: "#f97316",
   },
   {
     id: 3,
-    user_id: "50eaed3b-b7c3-4b04-a500-e78f84d09e0d",
+    user_id: "5844d779-cc4f-41b8-880d-523ce4389547",
     name: "Shopping",
     type: "expense",
     color: "#8b5cf6",
   },
   {
     id: 4,
-    user_id: "50eaed3b-b7c3-4b04-a500-e78f84d09e0d",
+    user_id: "5844d779-cc4f-41b8-880d-523ce4389547",
     name: "Entertainment",
     type: "expense",
     color: "#f59e0b",
   },
   {
     id: 5,
-    user_id: "50eaed3b-b7c3-4b04-a500-e78f84d09e0d",
+    user_id: "5844d779-cc4f-41b8-880d-523ce4389547",
     name: "Bills & Utilities",
     type: "expense",
     color: "#06b6d4",
   },
   {
     id: 6,
-    user_id: "50eaed3b-b7c3-4b04-a500-e78f84d09e0d",
+    user_id: "5844d779-cc4f-41b8-880d-523ce4389547",
     name: "Healthcare",
     type: "expense",
     color: "#84cc16",
   },
   {
     id: 7,
-    user_id: "50eaed3b-b7c3-4b04-a500-e78f84d09e0d",
+    user_id: "5844d779-cc4f-41b8-880d-523ce4389547",
     name: "Education",
     type: "expense",
     color: "#3b82f6",
   },
   {
     id: 8,
-    user_id: "50eaed3b-b7c3-4b04-a500-e78f84d09e0d",
+    user_id: "5844d779-cc4f-41b8-880d-523ce4389547",
     name: "Travel",
     type: "expense",
     color: "#ec4899",
   },
   {
     id: 9,
-    user_id: "50eaed3b-b7c3-4b04-a500-e78f84d09e0d",
+    user_id: "5844d779-cc4f-41b8-880d-523ce4389547",
     name: "Other",
     type: "expense",
     color: "#6b7280",
@@ -71,35 +71,35 @@ export const categoriesData = [
   // Income Categories
   {
     id: 10,
-    user_id: "50eaed3b-b7c3-4b04-a500-e78f84d09e0d",
+    user_id: "5844d779-cc4f-41b8-880d-523ce4389547",
     name: "Salary",
     type: "income",
     color: "#10b981",
   },
   {
     id: 11,
-    user_id: "50eaed3b-b7c3-4b04-a500-e78f84d09e0d",
+    user_id: "5844d779-cc4f-41b8-880d-523ce4389547",
     name: "Freelancing",
     type: "income",
     color: "#22c55e",
   },
   {
     id: 12,
-    user_id: "50eaed3b-b7c3-4b04-a500-e78f84d09e0d",
+    user_id: "5844d779-cc4f-41b8-880d-523ce4389547",
     name: "Investment",
     type: "income",
     color: "#6366f1",
   },
   {
     id: 13,
-    user_id: "50eaed3b-b7c3-4b04-a500-e78f84d09e0d",
+    user_id: "5844d779-cc4f-41b8-880d-523ce4389547",
     name: "Business",
     type: "income",
     color: "#14b8a6",
   },
   {
     id: 14,
-    user_id: "50eaed3b-b7c3-4b04-a500-e78f84d09e0d",
+    user_id: "5844d779-cc4f-41b8-880d-523ce4389547",
     name: "Other Income",
     type: "income",
     color: "#059669",
@@ -209,7 +209,7 @@ export const transactions = [
   },
   {
     id: 10,
-    user_id: "50eaed3b-b7c3-4b04-a500-e78f84d09e0d",
+    user_id: "5844d779-cc4f-41b8-880d-523ce4389547",
     type: "expense",
     amount: 120000,
     category_id: 5,
@@ -219,7 +219,7 @@ export const transactions = [
   },
   {
     id: 11,
-    user_id: "50eaed3b-b7c3-4b04-a500-e78f84d09e0d",
+    user_id: "5844d779-cc4f-41b8-880d-523ce4389547",
     type: "expense",
     amount: 200000,
     category_id: 4,
@@ -398,4 +398,9 @@ export const getCategoryByUser = (userId) => {
 
 export const getCategoryByType = (type, userId) => {
   return categoriesData.filter((c) => c.type === type && c.user_id === userId);
+};
+
+// Get category by ID from static data
+export const getCategoryById = (id) => {
+  return categoriesData.find((c) => c.id === id);
 };

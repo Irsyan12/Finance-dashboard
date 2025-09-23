@@ -1,10 +1,10 @@
 <script setup>
 import AppLayout from "../components/AppLayout.vue";
 import { ref, computed } from "vue";
-import { categoriesData, transactions } from "@/lib/data";
-import { useUserData } from "../composables/useData";
+import { transactions } from "@/services/supabase/data";
+import { useUserData } from "../services/composables/useData";
+import { useCategories } from "../services/composables/useCategories";
 import Header from "../components/View/Header.vue";
-import { useTransactions } from "../composables/useFinance";
 
 import {
   PlusIcon,
@@ -15,16 +15,19 @@ import {
   CheckIcon,
 } from "@heroicons/vue/24/outline";
 
-const { getTransactionByUserId } = useTransactions();
 const { user, isLoggedIn } = useUserData();
-const categoriesComputed = computed(() => [...categoriesData]);
-const Allcategories = ref([...categoriesComputed.value]);
+const {
+  categories,
+  loading,
+  error,
+  createCategory: createCategoryAPI,
+  updateCategory: updateCategoryAPI,
+  deleteCategory: deleteCategoryAPI,
+  fetchCategories,
+} = useCategories();
 
-// filter categories berdasarkan user login - make it reactive
-const categories = computed(() =>
-  Allcategories.value.filter((c) => c.user_id === user.value?.id)
-);
-
+// Fetch categories on mount
+fetchCategories();
 
 const isAddingCategory = ref(false);
 const editingCategory = ref(null);
@@ -77,15 +80,14 @@ const cancelAddCategory = () => {
   };
 };
 
-const saveNewCategory = () => {
+const saveNewCategory = async () => {
   if (newCategory.value.name.trim()) {
-    const id = Math.max(...Allcategories.value.map((c) => c.id)) + 1;
-    Allcategories.value.push({
-      id,
-      user_id: user.value?.id, // Add user_id when creating new category
-      ...newCategory.value,
-    });
-    cancelAddCategory();
+    try {
+      await createCategoryAPI(newCategory.value);
+      cancelAddCategory();
+    } catch (error) {
+      console.error("Error creating category:", error);
+    }
   }
 };
 
@@ -97,46 +99,55 @@ const cancelEditCategory = () => {
   editingCategory.value = null;
 };
 
-const saveEditCategory = () => {
+const saveEditCategory = async () => {
   if (editingCategory.value && editingCategory.value.name.trim()) {
-    const index = Allcategories.value.findIndex(
-      (c) => c.id === editingCategory.value.id
-    );
-    if (index !== -1) {
-      Allcategories.value[index] = { ...editingCategory.value };
+    try {
+      await updateCategoryAPI(editingCategory.value.id, {
+        name: editingCategory.value.name,
+        color: editingCategory.value.color,
+        type: editingCategory.value.type,
+      });
+      editingCategory.value = null;
+    } catch (error) {
+      console.error("Error updating category:", error);
     }
-    editingCategory.value = null;
   }
 };
 
-const deleteCategory = (categoryId) => {
+const deleteCategory = async (categoryId) => {
   if (
     confirm(
       "Are you sure you want to delete this category? This action cannot be undone."
     )
   ) {
-    const index = Allcategories.value.findIndex((c) => c.id === categoryId);
-    if (index !== -1) {
-      Allcategories.value.splice(index, 1);
+    try {
+      await deleteCategoryAPI(categoryId);
+    } catch (error) {
+      console.error("Error deleting category:", error);
     }
   }
 };
 
 const expenseCategories = computed(() =>
-  categories.value.filter((c) => c.type === "expense")
+  (categories.value || []).filter((c) => c.type === "expense")
 );
 const incomeCategories = computed(() =>
-  categories.value.filter((c) => c.type === "income")
+  (categories.value || []).filter((c) => c.type === "income")
 );
 
-// Get user transactions
+// Get user transactions (using dummy data for now)
 const userTransactions = computed(() => {
   if (!user.value?.id) return [];
-  return getTransactionByUserId(user.value.id);
+  return transactions; // Use dummy data
 });
 
 // Calculate category usage statistics
 const categoryUsageStats = computed(() => {
+  // Safe checks
+  if (!categories.value || !Array.isArray(categories.value)) return [];
+  if (!userTransactions.value || !Array.isArray(userTransactions.value))
+    return [];
+
   const usageMap = {};
   const totalTransactions = userTransactions.value.length;
 

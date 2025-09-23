@@ -1,9 +1,13 @@
 <script setup>
 import AppLayout from "../components/AppLayout.vue";
 import { ref, computed, onMounted } from "vue";
-import { transactions, categoriesData, formatCurrency } from "@/lib/data";
-import { useUserData } from "../composables/useData";
-import { useCategories } from "../composables/useFinance";
+import {
+  transactions,
+  categoriesData,
+  formatCurrency,
+  getCategoryById,
+} from "@/services/supabase/data";
+import { useUserData } from "../services/composables/useData";
 import Header from "../components/View/Header.vue";
 import AlertDialog from "@/components/ui/AlertDialog.vue";
 import {
@@ -19,7 +23,6 @@ import {
 } from "@heroicons/vue/24/outline";
 
 const { userData, user, isLoggedIn } = useUserData();
-const { getCategoryById } = useCategories();
 
 // Delete dialog state
 const deleteDialog = ref({

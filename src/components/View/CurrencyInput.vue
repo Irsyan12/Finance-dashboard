@@ -1,5 +1,5 @@
 <script setup>
-import { ref, nextTick } from "vue";
+import { ref, nextTick, watch } from "vue";
 
 const props = defineProps({
   id: {
@@ -50,6 +50,18 @@ if (props.modelValue) {
   displayValue.value = formatNumber(props.modelValue);
 }
 
+// Watch for external changes to modelValue
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (newValue !== null && newValue !== undefined && newValue !== "") {
+      displayValue.value = formatNumber(newValue);
+    } else {
+      displayValue.value = "";
+    }
+  }
+);
+
 // Handle input change
 const handleInput = async (event) => {
   const inputValue = event.target.value;
@@ -72,7 +84,7 @@ const handleInput = async (event) => {
     emit("update:modelValue", number);
   } else {
     displayValue.value = "";
-    emit("update:modelValue", null);
+    emit("update:modelValue", "");
   }
 };
 
@@ -88,6 +100,9 @@ const handlePaste = (event) => {
     const number = Number(numericOnly);
     displayValue.value = formatNumber(number);
     emit("update:modelValue", number);
+  } else {
+    displayValue.value = "";
+    emit("update:modelValue", "");
   }
 };
 

@@ -17,6 +17,12 @@ import { useTransactions } from "../services/composables/useTransaction";
 const { user, isLoggedIn } = useUserData();
 const { toast } = useToast();
 const { createTransaction } = useTransactions();
+    // If no categories found, create default ones
+    if (dbCategories.value.length === 0) {
+      console.log('No categories found, you may need to create some first');
+    }
+  });
+}
 
 const form = ref({
   amount: "",
@@ -38,9 +44,14 @@ const transactionTypes = ref([
   },
 ]);
 
-// Categories berdasarkan transaction type (reactive)
+// Categories berdasarkan transaction type (reactive) - from database
 const categories = computed(() => {
-  return getCategoryByType(form.value.type, user.value.id);
+  console.log('DB Categories:', dbCategories.value);
+  console.log('Current type:', form.value.type);
+  if (!dbCategories.value.length) return [];
+  const filtered = dbCategories.value.filter(c => c.type === form.value.type);
+  console.log('Filtered categories:', filtered);
+  return filtered;
 });
 
 // Watch transaction type change to reset category
@@ -63,17 +74,35 @@ const getNumericAmount = (amount) => {
   return 0;
 };
 
+// Helper function to generate simple UUID from integer ID
+const generateCategoryUUID = (categoryId) => {
+  // Convert integer category ID to UUID format
+  // Pad with zeros and format as UUID
+  const paddedId = categoryId.toString().padStart(8, '0');
+  return `${paddedId}-0000-0000-0000-000000000000`;
+};
+
+// Helper function to generate simple UUID
+const generateSimpleId = () => {
+  const timestamp = Date.now();
+  const userId = user.value?.id?.slice(-8) || 'user';
+  const random = Math.random().toString(36).substr(2, 9);
+  return `${timestamp}-${userId}-${random}`;
+};
+
 const submitTransaction = async () => {
   try {
     isSubmitting.value = true;
     const numericAmount = getNumericAmount(form.value.amount);
+    const transactionId = generateSimpleId();
 
     // Prepare transaction data for database
     const transactionData = {
+      id: transactionId,
       type: form.value.type,
       amount: numericAmount,
       description: form.value.description,
-      category_id: parseInt(form.value.category), // Ensure it's integer
+      category_id: form.value.category, // Keep as UUID string
       date: form.value.date,
     };
 
@@ -90,6 +119,7 @@ const submitTransaction = async () => {
       type: "expense",
       date: new Date().toISOString().split("T")[0],
     };
+
   } catch (error) {
     console.error("Error submitting transaction:", error);
     toast.error("Failed to add transaction", {

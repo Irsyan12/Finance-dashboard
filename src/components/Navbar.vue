@@ -5,7 +5,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@heroicons/vue/24/outline";
-import { useUserData } from "../composables/useData";
+import { useUserData } from "../services/composables/useData";
 import { useAuthStore } from "../stores/auth";
 
 // Gunakan composable untuk user data
