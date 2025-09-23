@@ -20,10 +20,10 @@ const getIcon = (type) => {
 
 const getClasses = (type) => {
   const classes = {
-    success: "bg-blue-600 border-green-500",
-    error: "bg-red-600 border-red-500",
-    info: "bg-blue-600 border-blue-500",
-    warning: "bg-yellow-600 border-yellow-500",
+    success: "bg-blue-950 border-blue-950",
+    error: "bg-red-600 border-red-600",
+    info: "bg-blue-950 border-blue-950",
+    warning: "bg-yellow-600 border-yellow-600",
   };
   return classes[type] || "bg-gray-600 border-gray-500";
 };

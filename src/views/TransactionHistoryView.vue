@@ -8,8 +8,8 @@ import {
   getCategoryById,
 } from "@/services/supabase/data";
 import { useUserData } from "../services/composables/useData";
+import { useAlert } from "@/services/composables/useAlert";
 import Header from "../components/View/Header.vue";
-import AlertDialog from "@/components/ui/AlertDialog.vue";
 import {
   FunnelIcon,
   XMarkIcon,
@@ -23,13 +23,7 @@ import {
 } from "@heroicons/vue/24/outline";
 
 const { userData, user, isLoggedIn } = useUserData();
-
-// Delete dialog state
-const deleteDialog = ref({
-  isOpen: false,
-  transactionId: null,
-  transactionDescription: "",
-});
+const { confirmDelete } = useAlert();
 
 // Filter states
 const filters = ref({
@@ -43,28 +37,22 @@ const filters = ref({
   searchText: "",
 });
 
-const deleteTransaction = (transactionId) => {
+const deleteTransaction = async (transactionId) => {
   const transaction = filteredTransactions.value.find(
     (t) => t.id === transactionId
   );
-  deleteDialog.value = {
-    isOpen: true,
-    transactionId: transactionId,
-    transactionDescription: transaction?.description || "No description",
-  };
-};
 
-const confirmDelete = () => {
-  console.log(
-    "Deleting transaction with ID:",
-    deleteDialog.value.transactionId
+  const confirmed = await confirmDelete(
+    "Delete Transaction",
+    `Are you sure you want to delete this transaction: '${
+      transaction?.description || "No description"
+    }'? This action cannot be undone.`
   );
-  // TODO: Implement actual delete logic here
-  deleteDialog.value.isOpen = false;
-};
 
-const cancelDelete = () => {
-  deleteDialog.value.isOpen = false;
+  if (confirmed) {
+    console.log("Deleting transaction with ID:", transactionId);
+    // TODO: Implement actual delete logic here
+  }
 };
 
 const showFilters = ref(false);
@@ -509,18 +497,5 @@ const summary = computed(() => {
         </div>
       </div>
     </div>
-
-    <!-- Delete Confirmation Dialog -->
-    <AlertDialog
-      :isOpen="deleteDialog.isOpen"
-      title="Delete Transaction"
-      :description="`Are you sure you want to delete this transaction: '${deleteDialog.transactionDescription}'? This action cannot be undone.`"
-      confirmText="Delete"
-      cancelText="Cancel"
-      variant="destructive"
-      @confirm="confirmDelete"
-      @cancel="cancelDelete"
-      @close="cancelDelete"
-    />
   </AppLayout>
 </template>

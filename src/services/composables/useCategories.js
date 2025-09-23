@@ -16,6 +16,11 @@ export const useCategories = () => {
       loading.value = true;
       error.value = null;
 
+      // Safe check for user
+      if (!user.value || !user.value.id) {
+        throw new Error("User not logged in");
+      }
+
       const newCategory = await categoryService.create({
         ...categoryData,
         user_id: user.value.id,
@@ -40,12 +45,19 @@ export const useCategories = () => {
       loading.value = true;
       error.value = null;
 
-      const data = await categoryService.getByUserId(user.value.id);
-      categories.value = data;
+      // Safe check for user
+      if (!user.value || !user.value.id) {
+        console.warn("No user available for fetching categories");
+        return [];
+      }
 
-      return data;
+      const data = await categoryService.getByUserId(user.value.id);
+      categories.value = data || [];
+
+      return data || [];
     } catch (err) {
       error.value = err.message;
+      categories.value = []; // Reset to empty array on error
       throw err;
     } finally {
       loading.value = false;

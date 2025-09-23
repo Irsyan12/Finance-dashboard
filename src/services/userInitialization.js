@@ -229,7 +229,6 @@ export const initializeUserCategories = async (userId) => {
         const hasBeenInitialized = await checkUserHasCategories(userId);
 
         if (hasBeenInitialized) {
-            console.log("✅ User already initialized, skipping category creation");
             return false; // No new initialization needed
         }
 

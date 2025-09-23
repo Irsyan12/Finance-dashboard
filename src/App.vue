@@ -11,6 +11,7 @@ getUser();
   <div>
     <router-view />
     <Sonner />
+    <GlobalAlert />
   </div>
 </template>
 

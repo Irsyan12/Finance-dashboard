@@ -17,12 +17,6 @@ import { useTransactions } from "../services/composables/useTransaction";
 const { user, isLoggedIn } = useUserData();
 const { toast } = useToast();
 const { createTransaction } = useTransactions();
-    // If no categories found, create default ones
-    if (dbCategories.value.length === 0) {
-      console.log('No categories found, you may need to create some first');
-    }
-  });
-}
 
 const form = ref({
   amount: "",

@@ -1,11 +1,11 @@
 <script setup>
 import AppLayout from "../components/AppLayout.vue";
-import { ref, computed } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import { transactions } from "@/services/supabase/data";
 import { useUserData } from "../services/composables/useData";
 import { useCategories } from "../services/composables/useCategories";
 import Header from "../components/View/Header.vue";
-
+import { useToast } from "../services/composables/useToast";
 import {
   PlusIcon,
   PencilIcon,
@@ -14,8 +14,11 @@ import {
   XMarkIcon,
   CheckIcon,
 } from "@heroicons/vue/24/outline";
+import { useAlert } from "@/services/composables/useAlert";
 
+const { toast } = useToast();
 const { user, isLoggedIn } = useUserData();
+const { confirm } = useAlert();
 const {
   categories,
   loading,
@@ -26,8 +29,16 @@ const {
   fetchCategories,
 } = useCategories();
 
-// Fetch categories on mount
-fetchCategories();
+// Fetch categories when user is available
+watch(
+  () => user.value,
+  (newUser) => {
+    if (newUser && isLoggedIn.value) {
+      fetchCategories();
+    }
+  },
+  { immediate: true }
+);
 
 const isAddingCategory = ref(false);
 const editingCategory = ref(null);
@@ -84,6 +95,9 @@ const saveNewCategory = async () => {
   if (newCategory.value.name.trim()) {
     try {
       await createCategoryAPI(newCategory.value);
+      toast.success("Category created", {
+        description: `Category "${newCategory.value.name}" has been added.`,
+      });
       cancelAddCategory();
     } catch (error) {
       console.error("Error creating category:", error);
@@ -115,15 +129,23 @@ const saveEditCategory = async () => {
 };
 
 const deleteCategory = async (categoryId) => {
-  if (
-    confirm(
-      "Are you sure you want to delete this category? This action cannot be undone."
-    )
-  ) {
+  const confirmed = await confirm(
+    "Delete Category",
+    "Are you sure you want to delete this category? This action cannot be undone."
+  );
+
+  if (confirmed) {
     try {
+      console.log("Deleting category with ID:", categoryId);
       await deleteCategoryAPI(categoryId);
+      toast.success("Category deleted", {
+        description: "The category has been successfully deleted.",
+      });
     } catch (error) {
       console.error("Error deleting category:", error);
+      toast.error("Failed to delete category", {
+        description: "An error occurred while deleting the category.",
+      });
     }
   }
 };
@@ -234,7 +256,7 @@ const categoryUsageStats = computed(() => {
               >
               <select
                 v-model="newCategory.type"
-                class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                class="w-full cursor-pointer px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="expense">Expense</option>
                 <option value="income">Income</option>
@@ -253,7 +275,7 @@ const categoryUsageStats = computed(() => {
                   @click="newCategory.color = color"
                   :style="{ backgroundColor: color }"
                   :class="[
-                    'w-8 h-8 rounded-full border-2 transition-all',
+                    'w-8 h-8 cursor-pointer rounded-full border-2 transition-all',
                     newCategory.color === color
                       ? 'border-white scale-110'
                       : 'border-gray-600',
@@ -267,14 +289,14 @@ const categoryUsageStats = computed(() => {
           <div class="flex space-x-3">
             <button
               @click="saveNewCategory"
-              class="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              class="flex items-center cursor-pointer space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
               <CheckIcon class="w-4 h-4" />
               <span>Save</span>
             </button>
             <button
               @click="cancelAddCategory"
-              class="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              class="flex items-center cursor-pointer space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
             >
               <XMarkIcon class="w-4 h-4" />
               <span>Cancel</span>
@@ -317,7 +339,7 @@ const categoryUsageStats = computed(() => {
                   @click="editingCategory.color = color"
                   :style="{ backgroundColor: color }"
                   :class="[
-                    'w-6 h-6 rounded-full border transition-all',
+                    'w-6 h-6 cursor-pointer rounded-full border transition-all',
                     editingCategory.color === color
                       ? 'border-white scale-110'
                       : 'border-gray-600',
@@ -327,14 +349,14 @@ const categoryUsageStats = computed(() => {
               <div class="flex space-x-2">
                 <button
                   @click="saveEditCategory"
-                  class="flex items-center space-x-1 px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
+                  class="flex items-center cursor-pointer space-x-1 px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
                 >
                   <CheckIcon class="w-3 h-3" />
                   <span>Save</span>
                 </button>
                 <button
                   @click="cancelEditCategory"
-                  class="flex items-center space-x-1 px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700 transition-colors"
+                  class="flex items-center cursor-pointer space-x-1 px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700 transition-colors"
                 >
                   <XMarkIcon class="w-3 h-3" />
                   <span>Cancel</span>
@@ -356,13 +378,13 @@ const categoryUsageStats = computed(() => {
               <div class="flex space-x-2">
                 <button
                   @click="startEditCategory(category)"
-                  class="p-1 text-gray-400 hover:text-blue-400 transition-colors"
+                  class="p-1 cursor-pointer text-gray-400 hover:text-blue-400 transition-colors"
                 >
                   <PencilIcon class="w-4 h-4" />
                 </button>
                 <button
                   @click="deleteCategory(category.id)"
-                  class="p-1 text-gray-400 hover:text-red-400 transition-colors"
+                  class="p-1 cursor-pointer text-gray-400 hover:text-red-400 transition-colors"
                 >
                   <TrashIcon class="w-4 h-4" />
                 </button>
@@ -422,14 +444,14 @@ const categoryUsageStats = computed(() => {
               <div class="flex space-x-2">
                 <button
                   @click="saveEditCategory"
-                  class="flex items-center space-x-1 px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
+                  class="flex cursor-pointer items-center space-x-1 px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
                 >
                   <CheckIcon class="w-3 h-3" />
                   <span>Save</span>
                 </button>
                 <button
                   @click="cancelEditCategory"
-                  class="flex items-center space-x-1 px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700 transition-colors"
+                  class="flex cursor-pointer items-center space-x-1 px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700 transition-colors"
                 >
                   <XMarkIcon class="w-3 h-3" />
                   <span>Cancel</span>
@@ -451,13 +473,13 @@ const categoryUsageStats = computed(() => {
               <div class="flex space-x-2">
                 <button
                   @click="startEditCategory(category)"
-                  class="p-1 text-gray-400 hover:text-blue-400 transition-colors"
+                  class="p-1 cursor-pointer text-gray-400 hover:text-blue-400 transition-colors"
                 >
                   <PencilIcon class="w-4 h-4" />
                 </button>
                 <button
                   @click="deleteCategory(category.id)"
-                  class="p-1 text-gray-400 hover:text-red-400 transition-colors"
+                  class="p-1 cursor-pointer text-gray-400 hover:text-red-400 transition-colors"
                 >
                   <TrashIcon class="w-4 h-4" />
                 </button>
