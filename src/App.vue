@@ -1,5 +1,5 @@
 <script setup>
-import { useAuth } from "./services/composables/useAuth";
+import { useAuth } from "./composables/useAuth";
 import Sonner from "./components/ui/sonner.vue";
 
 const { user, getUser } = useAuth();

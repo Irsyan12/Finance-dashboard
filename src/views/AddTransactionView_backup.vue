@@ -10,9 +10,9 @@ import ButtonForm from "../components/View/ButtonForm.vue";
 import { ref, watch, computed } from "vue";
 import { PlusIcon, XMarkIcon } from "@heroicons/vue/24/outline";
 import { getCategoryByType, formatCurrency } from "../services/supabase/data";
-import { useUserData } from "../services/composables/useData";
-import { useToast } from "../services/composables/useToast";
-import { useTransactions } from "../services/composables/useTransaction";
+import { useUserData } from "../composables/useData";
+import { useToast } from "../composables/useToast";
+import { useTransactions } from "../composables/useTransaction";
 
 const { user, isLoggedIn } = useUserData();
 const { toast } = useToast();
@@ -40,11 +40,11 @@ const transactionTypes = ref([
 
 // Categories berdasarkan transaction type (reactive) - from database
 const categories = computed(() => {
-  console.log('DB Categories:', dbCategories.value);
-  console.log('Current type:', form.value.type);
+  console.log("DB Categories:", dbCategories.value);
+  console.log("Current type:", form.value.type);
   if (!dbCategories.value.length) return [];
-  const filtered = dbCategories.value.filter(c => c.type === form.value.type);
-  console.log('Filtered categories:', filtered);
+  const filtered = dbCategories.value.filter((c) => c.type === form.value.type);
+  console.log("Filtered categories:", filtered);
   return filtered;
 });
 
@@ -72,14 +72,14 @@ const getNumericAmount = (amount) => {
 const generateCategoryUUID = (categoryId) => {
   // Convert integer category ID to UUID format
   // Pad with zeros and format as UUID
-  const paddedId = categoryId.toString().padStart(8, '0');
+  const paddedId = categoryId.toString().padStart(8, "0");
   return `${paddedId}-0000-0000-0000-000000000000`;
 };
 
 // Helper function to generate simple UUID
 const generateSimpleId = () => {
   const timestamp = Date.now();
-  const userId = user.value?.id?.slice(-8) || 'user';
+  const userId = user.value?.id?.slice(-8) || "user";
   const random = Math.random().toString(36).substr(2, 9);
   return `${timestamp}-${userId}-${random}`;
 };
@@ -113,7 +113,6 @@ const submitTransaction = async () => {
       type: "expense",
       date: new Date().toISOString().split("T")[0],
     };
-
   } catch (error) {
     console.error("Error submitting transaction:", error);
     toast.error("Failed to add transaction", {

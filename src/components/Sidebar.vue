@@ -6,7 +6,7 @@ import {
   ClockIcon,
   ArrowRightEndOnRectangleIcon,
 } from "@heroicons/vue/24/outline";
-import { useAuth } from "../services/composables/useAuth";
+import { useAuth } from "../composables/useAuth";
 import { ref, inject } from "vue";
 import { useRoute } from "vue-router";
 

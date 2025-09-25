@@ -7,8 +7,8 @@ import {
   formatCurrency,
   getCategoryById,
 } from "@/services/supabase/data";
-import { useUserData } from "../services/composables/useData";
-import { useAlert } from "@/services/composables/useAlert";
+import { useUserData } from "../composables/useData";
+import { useAlert } from "@/composables/useAlert";
 import Header from "../components/View/Header.vue";
 import {
   FunnelIcon,

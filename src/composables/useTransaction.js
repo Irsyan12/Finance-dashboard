@@ -1,8 +1,8 @@
 import { ref, computed } from "vue";
-import { transactionService } from "../supabase";
+import { transactionService } from "../services/supabase";
 import { useUserData } from "./useData";
 import { useToast } from "./useToast";
-import { formatCurrency } from "../supabase/data";
+import { formatCurrency } from "../services/supabase/data";
 
 export const useTransactions = () => {
   const { user } = useUserData();

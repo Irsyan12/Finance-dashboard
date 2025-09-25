@@ -1,4 +1,4 @@
-import { supabase } from "../supabase/supabase";
+import { supabase } from "../services/supabase/supabase";
 import { ref } from "vue";
 import { useUserInitialization } from "./useUserInitialization";
 
@@ -12,7 +12,6 @@ supabase.auth.onAuthStateChange(async (event, session) => {
 
   // If user just logged in and it's a new user
   if (event === "SIGNED_IN" && newUser && !user.value) {
-
     // Initialize user data in background (non-blocking)
     initializeNewUser(newUser.id).catch((error) => {
       console.error("Background user initialization failed:", error);

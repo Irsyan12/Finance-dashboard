@@ -2,7 +2,7 @@
 import AppLayout from "../components/AppLayout.vue";
 import { computed } from "vue";
 import { useAuthStore } from "../stores/auth";
-import { useUserData } from "../services/composables/useData";
+import { useUserData } from "../composables/useData";
 
 const { userData, isLoggedIn } = useUserData();
 

@@ -8,7 +8,7 @@ import {
   getRecentTransactions,
   getSummaryStats,
   formatCurrency,
-} from "../supabase/data";
+} from "../services/supabase/data";
 
 // Composable untuk data transaksi (static/mock data)
 export const useFinanceData = () => {

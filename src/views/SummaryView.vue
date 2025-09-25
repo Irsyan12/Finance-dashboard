@@ -14,8 +14,8 @@ import {
   categoriesData,
   getCategoryById,
 } from "@/services/supabase/data";
-import { useFinanceData } from "@/services/composables/useFinance";
-import { useUserData } from "../services/composables/useData";
+import { useFinanceData } from "@/composables/useFinance";
+import { useUserData } from "../composables/useData";
 
 const { user, isLoggedIn } = useUserData();
 const { getTransactionByUserId } = useFinanceData();

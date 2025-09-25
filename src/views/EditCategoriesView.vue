@@ -2,10 +2,10 @@
 import AppLayout from "../components/AppLayout.vue";
 import { ref, computed, watch, onMounted } from "vue";
 import { transactions } from "@/services/supabase/data";
-import { useUserData } from "../services/composables/useData";
-import { useCategories } from "../services/composables/useCategories";
+import { useUserData } from "../composables/useData";
+import { useCategories } from "../composables/useCategories";
 import Header from "../components/View/Header.vue";
-import { useToast } from "../services/composables/useToast";
+import { useToast } from "../composables/useToast";
 import {
   PlusIcon,
   PencilIcon,
@@ -14,7 +14,7 @@ import {
   XMarkIcon,
   CheckIcon,
 } from "@heroicons/vue/24/outline";
-import { useAlert } from "@/services/composables/useAlert";
+import { useAlert } from "@/composables/useAlert";
 
 const { toast } = useToast();
 const { user, isLoggedIn } = useUserData();

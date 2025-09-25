@@ -1,5 +1,5 @@
 import { ref, computed } from "vue";
-import { categoryService } from "../supabase";
+import { categoryService } from "../services/supabase";
 import { useAuth } from "./useAuth";
 import { useToast } from "./useToast";
 

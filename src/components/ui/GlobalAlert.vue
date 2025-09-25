@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-import { useAlert } from "@/services/composables/useAlert";
+import { useAlert } from "@/composables/useAlert";
 
 const { alertState, handleConfirm, handleCancel } = useAlert();
 </script>

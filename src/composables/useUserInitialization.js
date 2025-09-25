@@ -2,7 +2,7 @@ import { ref } from "vue";
 import {
   initializeUserCategories,
   debugCategoryCreation,
-} from "../userInitialization";
+} from "../services/userInitialization";
 import { useToast } from "./useToast";
 
 export const useUserInitialization = () => {
@@ -73,7 +73,9 @@ export const useUserInitialization = () => {
     const { user } = await import("./useData.js");
     const currentUser =
       user.value ||
-      (await import("../supabase/supabase.js")).supabase.auth.getUser();
+      (
+        await import("../services/supabase/supabase.js")
+      ).supabase.auth.getUser();
 
     if (!currentUser || !currentUser.id) {
       toast.error("No user logged in");

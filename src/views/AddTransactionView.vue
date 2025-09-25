@@ -10,9 +10,9 @@ import ButtonForm from "../components/View/ButtonForm.vue";
 import { ref, watch, computed } from "vue";
 import { PlusIcon, XMarkIcon } from "@heroicons/vue/24/outline";
 import { getCategoryByType, formatCurrency } from "../services/supabase/data";
-import { useUserData } from "../services/composables/useData";
-import { useToast } from "../services/composables/useToast";
-import { useTransactions } from "../services/composables/useTransaction";
+import { useUserData } from "../composables/useData";
+import { useToast } from "../composables/useToast";
+import { useTransactions } from "../composables/useTransaction";
 
 const { user, isLoggedIn } = useUserData();
 const { toast } = useToast();
