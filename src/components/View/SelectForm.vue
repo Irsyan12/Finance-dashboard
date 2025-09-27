@@ -39,7 +39,30 @@ const emit = defineEmits(["update:modelValue"]);
 
 // Handle select change
 const handleChange = (event) => {
-  emit("update:modelValue", event.target.value);
+  let value = event.target.value;
+
+  // If optionValue is specified and it's an object property that should be a number,
+  // convert the string value back to number
+  if (props.optionValue && props.options.length > 0) {
+    const firstOption = props.options[0];
+    if (
+      typeof firstOption === "object" &&
+      firstOption[props.optionValue] !== undefined
+    ) {
+      const originalType = typeof firstOption[props.optionValue];
+      if (originalType === "number") {
+        value = Number(value);
+      }
+    }
+  }
+
+  console.log("🔄 SelectForm - Value changed:", {
+    originalValue: event.target.value,
+    convertedValue: value,
+    optionValue: props.optionValue,
+  });
+
+  emit("update:modelValue", value);
 };
 
 // Get option value

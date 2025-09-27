@@ -11,6 +11,7 @@ import { DEFAULT_FILTERS } from "@/constants/forms";
 import Header from "../components/View/Header.vue";
 import SummarySkeleton from "../components/ui/SummarySkeleton.vue";
 import TransactionListSkeleton from "../components/ui/TransactionListSkeleton.vue";
+import { formatRelativeDate } from "@/utils/helpers";
 import {
   FunnelIcon,
   XMarkIcon,
@@ -487,13 +488,7 @@ const summary = computed(() => {
                 <div class="flex items-center space-x-4 text-sm text-gray-400">
                   <span class="flex items-center">
                     <CalendarDaysIcon class="w-4 h-4 mr-1" />
-                    {{
-                      new Date(transaction.date).toLocaleDateString("id-ID", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })
-                    }}
+                    {{ formatRelativeDate(transaction.date) }}
                   </span>
                   <span class="flex items-center">
                     <TagIcon class="w-4 h-4 mr-1" />

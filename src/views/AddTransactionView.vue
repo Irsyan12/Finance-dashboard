@@ -13,19 +13,31 @@ import { useUserData } from "../composables/useData";
 import { useToast } from "../composables/useToast";
 import { useTransactions } from "../composables/useTransactions";
 import { useCategories } from "../composables/useCategories";
-import { watchUserAndFetchCategories } from "@/constants/watchers";
+import { watchUserAndFetchAll } from "@/constants/watchers";
+import { formatCurrency } from "@/services/supabase/data";
 import {
   TRANSACTION_TYPE_OPTIONS,
   getDefaultTransaction,
 } from "@/constants/forms";
+import {
+  getCategoryByIdFromRealData,
+  formatRelativeDate,
+  parseNumericAmount,
+} from "@/utils/helpers";
 
 const { user, isLoggedIn } = useUserData();
 const { toast } = useToast();
-const { createTransaction } = useTransactions();
 const { categories, fetchCategories } = useCategories();
+const {
+  createTransaction,
+  transactions: userTransactions,
+  fetchTransactions,
+  recentTransactions,
+  loading: transactionsLoading,
+} = useTransactions();
 
 // Fetch categories when user is available
-watchUserAndFetchCategories(user, isLoggedIn, fetchCategories);
+watchUserAndFetchAll(user, isLoggedIn, fetchCategories, fetchTransactions);
 
 const form = ref(getDefaultTransaction());
 
@@ -37,9 +49,12 @@ const filteredCategories = computed(() => {
   if (!categories.value || !Array.isArray(categories.value)) {
     return [];
   }
-  return categories.value.filter(
+
+  const filtered = categories.value.filter(
     (category) => category.type === form.value.type
   );
+
+  return filtered;
 });
 
 // Watch transaction type change to reset category
@@ -52,31 +67,50 @@ watch(
 
 const isSubmitting = ref(false);
 
-// Helper function to get numeric amount
-const getNumericAmount = (amount) => {
-  if (typeof amount === "number") return amount;
-  if (typeof amount === "string" && amount !== "") {
-    const parsed = parseFloat(amount.replace(/[^\d.-]/g, ""));
-    return isNaN(parsed) ? 0 : parsed;
-  }
-  return 0;
-};
-
 const submitTransaction = async () => {
   try {
     isSubmitting.value = true;
-    const numericAmount = getNumericAmount(form.value.amount);
+    const numericAmount = parseNumericAmount(form.value.amount);
+
+    // Validate category_id
+    if (!form.value.category || form.value.category === "") {
+      toast.error("Please select a category", {
+        description: "Category is required to create a transaction",
+      });
+      return;
+    }
+
+    // Ensure category is a valid UUID or ID
+    const categoryId = form.value.category;
+    if (
+      !categoryId ||
+      (typeof categoryId === "string" && categoryId.trim() === "")
+    ) {
+      toast.error("Please select a valid category", {
+        description: "Selected category is invalid",
+      });
+      return;
+    }
+
+    // Verify that the selected category exists in our list
+    const selectedCategory = filteredCategories.value.find(
+      (cat) => cat.id === categoryId
+    );
+    if (!selectedCategory) {
+      toast.error("Selected category not found", {
+        description: "Please select another category",
+      });
+      return;
+    }
 
     // Prepare transaction data for database
     const transactionData = {
       type: form.value.type,
       amount: numericAmount,
       description: form.value.description,
-      category_id: parseInt(form.value.category), // Ensure it's integer
+      category_id: categoryId, // Use the categoryId directly (UUID or integer)
       date: form.value.date,
     };
-
-    console.log("Submitting to database:", transactionData);
 
     // Save to database using useTransactions
     await createTransaction(transactionData);
@@ -84,7 +118,6 @@ const submitTransaction = async () => {
     // Reset form after successful creation
     form.value = getDefaultTransaction();
   } catch (error) {
-    console.error("Error submitting transaction:", error);
     toast.error("Failed to add transaction", {
       description: "Please try again later",
     });
@@ -95,10 +128,6 @@ const submitTransaction = async () => {
 
 const clearForm = () => {
   form.value = getDefaultTransaction();
-
-  toast.info("Form cleared", {
-    description: "All fields have been reset",
-  });
 };
 </script>
 
@@ -210,34 +239,61 @@ const clearForm = () => {
       <h3 class="text-lg font-semibold text-gray-200 mb-4">
         Recent Transactions
       </h3>
-      <div class="space-y-3">
+
+      <!-- Loading State -->
+      <div v-if="transactionsLoading" class="space-y-3">
+        <div v-for="i in 3" :key="i" class="animate-pulse">
+          <div
+            class="flex justify-between items-center py-2 border-b border-gray-800"
+          >
+            <div class="space-y-2">
+              <div class="h-4 bg-gray-700 rounded w-32"></div>
+              <div class="h-3 bg-gray-700 rounded w-48"></div>
+            </div>
+            <div class="h-4 bg-gray-700 rounded w-24"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Transactions Data -->
+      <div
+        v-else-if="recentTransactions && recentTransactions.length > 0"
+        class="space-y-3"
+      >
         <div
-          class="flex justify-between items-center py-2 border-b border-gray-800"
+          v-for="transaction in recentTransactions.slice(0, 3)"
+          :key="transaction.id"
+          class="flex justify-between items-center py-2 border-b border-gray-800 last:border-b-0"
         >
           <div>
-            <p class="font-medium text-gray-200">Grocery Shopping</p>
-            <p class="text-sm text-gray-500">Today, 2:30 PM • Food & Dining</p>
-          </div>
-          <span class="text-red-400 font-semibold">-Rp 125.500</span>
-        </div>
-        <div
-          class="flex justify-between items-center py-2 border-b border-gray-800"
-        >
-          <div>
-            <p class="font-medium text-gray-200">Salary Deposit</p>
-            <p class="text-sm text-gray-500">Yesterday, 9:00 AM • Income</p>
-          </div>
-          <span class="text-green-400 font-semibold">+Rp 4.200.000</span>
-        </div>
-        <div class="flex justify-between items-center py-2">
-          <div>
-            <p class="font-medium text-gray-200">Coffee Shop</p>
+            <p class="font-medium text-gray-200">
+              {{ transaction.description }}
+            </p>
             <p class="text-sm text-gray-500">
-              2 days ago, 8:15 AM • Food & Dining
+              {{ formatRelativeDate(transaction.date) }} •
+              {{
+                getCategoryByIdFromRealData(transaction.category_id, categories)
+              }}
             </p>
           </div>
-          <span class="text-red-400 font-semibold">-Rp 4.500</span>
+          <span
+            :class="[
+              'font-semibold',
+              transaction.type === 'expense'
+                ? 'text-red-400'
+                : 'text-green-400',
+            ]"
+          >
+            {{ transaction.type === "expense" ? "-" : "+" }}
+            {{ formatCurrency(transaction.amount, transaction.type) }}
+          </span>
         </div>
+      </div>
+
+      <!-- Empty State -->
+      <div v-else class="text-center py-8 text-gray-500">
+        <p>No transactions yet</p>
+        <p class="text-sm mt-1">Add your first transaction above</p>
       </div>
     </div>
 
