@@ -48,11 +48,15 @@ const toggleSidebar = () => {
     <div class="hidden md:flex items-center">
       <div v-if="isLoggedIn" class="flex items-center gap-4">
         <span>Hello, {{ userData?.full_name }}</span>
-        <img
-          src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
-          alt="user avatar"
-          class="w-8 h-8 rounded-full object-cover border border-gray-400"
-        />
+        <span
+          class="w-8 h-8 flex select-none items-center justify-center rounded-full bg-blue-900 text-white"
+        >
+          {{
+            userData?.full_name
+              ? userData.full_name.charAt(0).toUpperCase()
+              : ""
+          }}
+        </span>
         <button
           @click="auth.logout"
           class="flex items-center gap-2 px-2 py-2 bg-red-500 rounded hover:bg-red-600 hover:cursor-pointer transition"
@@ -74,39 +78,53 @@ const toggleSidebar = () => {
     <!-- Small screen (hamburger menu) -->
     <div class="md:hidden flex items-center">
       <button @click="isOpen = !isOpen">
-        <img
-          src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
-          alt=""
-          class="w-8 h-8 rounded-full object-cover border border-gray-400"
-        />
+        <span
+          class="w-8 h-8 flex select-none items-center justify-center rounded-full bg-blue-900 text-white"
+        >
+          {{
+            userData?.full_name
+              ? userData.full_name.charAt(0).toUpperCase()
+              : ""
+          }}
+        </span>
       </button>
+      
     </div>
+
+    <!-- Mobile dropdown menu -->
+    <transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0 scale-95"
+      enter-to-class="opacity-100 scale-100"
+      leave-active-class="transition duration-150 ease-in"
+      leave-from-class="opacity-100 scale-100"
+      leave-to-class="opacity-0 scale-95"
+    >
+      <div
+        v-if="isOpen"
+        class="md:hidden bg-gray-800 border-b border-gray-700 text-white absolute top-16 right-0 rounded-b-xl w-60 p-4 space-y-4 shadow-lg"
+        
+        >
+        <div v-if="isLoggedIn" class="w-60 space-y-2">
+          <span>{{ userData?.full_name }}</span>
+          <button
+            @click="auth.logout"
+            class="flex items-center gap-2 px-4 py-2 mt-2 bg-red-500 rounded hover:bg-red-600 transition"
+            
+            >
+            <ArrowRightEndOnRectangleIcon class="h-4 w-4" />
+            Logout
+          </button>
+        </div>
+        <div v-else>
+          <a
+            href="/login"
+            class="px-4 py-2 bg-blue-700 rounded hover:bg-blue-600 transition block text-center"
+          >
+            Login
+          </a>
+        </div>
+      </div>
+    </transition>
   </nav>
-
-  <!-- Mobile dropdown menu -->
-  <div
-    v-if="isOpen"
-    class="md:hidden bg-gray-800 border-b border-gray-700 text-white absolute right-4 top-16 rounded-b-xl w-60 p-4 space-y-4 shadow-lg"
-  >
-    <div v-if="isLoggedIn" class="w-60 space-y-2">
-      <span>{{ userData?.full_name }}</span>
-      <button
-        @click="auth.logout"
-        class="flex items-center gap-2 px-4 py-2 mt-2 bg-red-500 rounded hover:bg-red-600 transition"
-      >
-        <ArrowRightEndOnRectangleIcon class="h-4 w-4" />
-        Logout
-      </button>
-    </div>
-    <div v-else>
-      <a
-        href="/login"
-        class="px-4 py-2 bg-blue-700 rounded hover:bg-blue-600 transition block text-center"
-      >
-        Login
-      </a>
-    </div>
-  </div>
 </template>
-
-<style scoped></style>

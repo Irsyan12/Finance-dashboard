@@ -65,6 +65,11 @@ export const useTransactions = () => {
     }
   };
 
+  // recent transactions
+  const recentTransactions = computed(() => {
+    return transactions.value.slice(0, 5);
+  });
+
   // Update transaction
   const updateTransaction = async (id, updates) => {
     try {
@@ -140,6 +145,7 @@ export const useTransactions = () => {
     error,
     createTransaction,
     fetchTransactions,
+    recentTransactions,
     updateTransaction,
     deleteTransaction,
     totalIncome,

@@ -100,7 +100,7 @@ const savingsRate = computed(() => {
           <CalendarIcon class="w-5 h-5 text-gray-400" />
           <select
             v-model="selectedPeriod"
-            class="bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
           >
             <option value="week">This Week</option>
             <option value="month">This Month</option>
@@ -209,7 +209,7 @@ const savingsRate = computed(() => {
                     }"
                   ></div>
                 </div>
-                <span class="text-red-400 font-semibold w-22 text-right">{{
+                <span class="text-red-400 font-semibold md w-14 md:w-27 text-right">{{
                   formatCurrency(category.amount)
                 }}</span>
               </div>
@@ -231,7 +231,7 @@ const savingsRate = computed(() => {
               class="flex items-center justify-between"
             >
               <span class="text-gray-300">{{ category.name }}</span>
-              <div class="flex items-center space-x-3">
+              <div class="flex items-center space-x-5">
                 <div class="flex-1 bg-gray-700 rounded-full h-2 w-24">
                   <div
                     class="bg-green-400 h-2 rounded-full transition-all duration-300"
@@ -240,7 +240,7 @@ const savingsRate = computed(() => {
                     }"
                   ></div>
                 </div>
-                <span class="text-green-400 font-semibold w-22 text-right">
+                <span class="text-green-400 font-semibold w-14 md:w-27 text-right">
                   <span>{{ formatCurrency(category.amount) }}</span></span
                 >
               </div>

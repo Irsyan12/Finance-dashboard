@@ -1,15 +1,16 @@
 <script setup>
 import AppLayout from "../components/AppLayout.vue";
-import { ref, computed, onMounted } from "vue";
-import {
-  transactions,
-  categoriesData,
-  formatCurrency,
-  getCategoryById,
-} from "@/services/supabase/data";
+import { ref, computed, onMounted, watch } from "vue";
+import { formatCurrency } from "@/services/supabase/data";
 import { useUserData } from "../composables/useData";
 import { useAlert } from "@/composables/useAlert";
+import { useTransactions } from "@/composables/useTransactions";
+import { useCategories } from "../composables/useCategories";
+import { watchUserAndFetchAll } from "@/constants/watchers";
+import { DEFAULT_FILTERS } from "@/constants/forms";
 import Header from "../components/View/Header.vue";
+import SummarySkeleton from "../components/ui/SummarySkeleton.vue";
+import TransactionListSkeleton from "../components/ui/TransactionListSkeleton.vue";
 import {
   FunnelIcon,
   XMarkIcon,
@@ -24,20 +25,25 @@ import {
 
 const { userData, user, isLoggedIn } = useUserData();
 const { confirmDelete } = useAlert();
+const {
+  categories,
+  fetchCategories,
+  loading: transactionLoading,
+} = useCategories();
+const {
+  transactions: userTransactions,
+  fetchTransactions,
+  deleteTransaction: deleteTransactionAPI,
+  loading: transactionsLoading,
+} = useTransactions();
+
+// Fetch transactions and categories when user is available
+watchUserAndFetchAll(user, isLoggedIn, fetchCategories, fetchTransactions);
 
 // Filter states
-const filters = ref({
-  type: "all",
-  category: "all",
-  dateRange: "all", // 'all', 'today', 'week', 'month', 'custom'
-  customDateFrom: "",
-  customDateTo: "",
-  minAmount: "",
-  maxAmount: "",
-  searchText: "",
-});
+const filters = ref({ ...DEFAULT_FILTERS });
 
-const deleteTransaction = async (transactionId) => {
+const deleteTransactionAction = async (transactionId) => {
   const transaction = filteredTransactions.value.find(
     (t) => t.id === transactionId
   );
@@ -50,28 +56,49 @@ const deleteTransaction = async (transactionId) => {
   );
 
   if (confirmed) {
-    console.log("Deleting transaction with ID:", transactionId);
-    // TODO: Implement actual delete logic here
+    try {
+      await deleteTransactionAPI(transactionId);
+    } catch (error) {
+      console.error("Error deleting transaction:", error);
+    }
   }
 };
 
 const showFilters = ref(false);
 
-// Get user's transactions
-const userTransactions = computed(() => {
-  if (!user.value?.id) return [];
-  return transactions.filter((t) => t.user_id === user.value.id);
+// Loading state
+const isLoading = computed(() => {
+  return transactionLoading.value || transactionsLoading.value || !user.value;
 });
 
 // Get user's categories
 const userCategories = computed(() => {
-  if (!user.value?.id) return [];
-  return categoriesData.filter((c) => c.user_id === user.value.id);
+  if (!user.value?.id || !categories.value) return [];
+  return categories.value;
 });
+
+// Helper function to get category by ID using real data
+const getCategoryByIdFromRealData = (categoryId) => {
+  const category = categories.value?.find((c) => c.id === categoryId);
+  console.log("🐛 DEBUG - getCategoryByIdFromRealData:", {
+    categoryId,
+    foundCategory: category,
+    allCategories: categories.value,
+  });
+  return category;
+};
 
 // Filter transactions
 const filteredTransactions = computed(() => {
-  let result = [...userTransactions.value];
+  console.log("🐛 DEBUG - Starting filter with:", {
+    userTransactions: userTransactions.value?.length || 0,
+    categories: categories.value?.length || 0,
+    filtersActive: filters.value,
+  });
+
+  let result = [...(userTransactions.value || [])];
+
+  console.log("🐛 DEBUG - Initial result count:", result.length);
 
   // Filter by type
   if (filters.value.type !== "all") {
@@ -139,11 +166,20 @@ const filteredTransactions = computed(() => {
   // Filter by search text
   if (filters.value.searchText) {
     const searchLower = filters.value.searchText.toLowerCase();
-    result = result.filter(
-      (t) =>
+    result = result.filter((t) => {
+      const category = getCategoryByIdFromRealData(t.category_id);
+      console.log("🐛 DEBUG - Transaction search:", {
+        transactionId: t.id,
+        categoryId: t.category_id,
+        foundCategory: category,
+        description: t.description,
+      });
+
+      return (
         t.description?.toLowerCase().includes(searchLower) ||
-        getCategoryById(t.category_id)?.name.toLowerCase().includes(searchLower)
-    );
+        category?.name.toLowerCase().includes(searchLower)
+      );
+    });
   }
 
   // Sort by date (newest first)
@@ -154,16 +190,7 @@ const filteredTransactions = computed(() => {
 
 // Clear all filters
 const clearFilters = () => {
-  filters.value = {
-    type: "all",
-    category: "all",
-    dateRange: "all",
-    customDateFrom: "",
-    customDateTo: "",
-    minAmount: "",
-    maxAmount: "",
-    searchText: "",
-  };
+  filters.value = { ...DEFAULT_FILTERS };
 };
 
 // Summary statistics
@@ -358,33 +385,39 @@ const summary = computed(() => {
       </div>
 
       <!-- Summary Statistics -->
-      <div v-if="isLoggedIn" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div class="bg-gray-900 rounded-lg p-4 border border-gray-800">
-          <div class="text-sm text-gray-400 mb-1">Total Transactions</div>
-          <div class="text-2xl font-bold text-white">{{ summary.count }}</div>
-        </div>
-        <div class="bg-gray-900 rounded-lg p-4 border border-gray-800">
-          <div class="text-sm text-gray-400 mb-1">Total Income</div>
-          <div class="text-2xl font-bold text-green-400">
-            +{{ formatCurrency(summary.income) }}
+      <div v-if="isLoggedIn">
+        <!-- Loading Skeleton for Summary -->
+        <SummarySkeleton v-if="isLoading" :count="4" />
+
+        <!-- Real Summary Statistics -->
+        <div v-else class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="bg-gray-900 rounded-lg p-4 border border-gray-800">
+            <div class="text-sm text-gray-400 mb-1">Total Transactions</div>
+            <div class="text-2xl font-bold text-white">{{ summary.count }}</div>
           </div>
-        </div>
-        <div class="bg-gray-900 rounded-lg p-4 border border-gray-800">
-          <div class="text-sm text-gray-400 mb-1">Total Expense</div>
-          <div class="text-2xl font-bold text-red-400">
-            -{{ formatCurrency(summary.expense) }}
+          <div class="bg-gray-900 rounded-lg p-4 border border-gray-800">
+            <div class="text-sm text-gray-400 mb-1">Total Income</div>
+            <div class="text-2xl font-bold text-green-400">
+              +{{ formatCurrency(summary.income) }}
+            </div>
           </div>
-        </div>
-        <div class="bg-gray-900 rounded-lg p-4 border border-gray-800">
-          <div class="text-sm text-gray-400 mb-1">Net Balance</div>
-          <div
-            :class="[
-              'text-2xl font-bold',
-              summary.balance >= 0 ? 'text-green-400' : 'text-red-400',
-            ]"
-          >
-            {{ summary.balance >= 0 ? "+" : ""
-            }}{{ formatCurrency(summary.balance) }}
+          <div class="bg-gray-900 rounded-lg p-4 border border-gray-800">
+            <div class="text-sm text-gray-400 mb-1">Total Expense</div>
+            <div class="text-2xl font-bold text-red-400">
+              -{{ formatCurrency(summary.expense) }}
+            </div>
+          </div>
+          <div class="bg-gray-900 rounded-lg p-4 border border-gray-800">
+            <div class="text-sm text-gray-400 mb-1">Net Balance</div>
+            <div
+              :class="[
+                'text-2xl font-bold',
+                summary.balance >= 0 ? 'text-green-400' : 'text-red-400',
+              ]"
+            >
+              {{ summary.balance >= 0 ? "+" : ""
+              }}{{ formatCurrency(summary.balance) }}
+            </div>
           </div>
         </div>
       </div>
@@ -398,6 +431,9 @@ const summary = computed(() => {
           Please log in to view your transaction history.
         </div>
       </div>
+
+      <!-- Loading Skeleton for Transactions -->
+      <TransactionListSkeleton v-else-if="isLoading" :count="5" />
 
       <div
         v-else-if="filteredTransactions.length === 0"
@@ -427,8 +463,8 @@ const summary = computed(() => {
               <div
                 :style="{
                   backgroundColor:
-                    getCategoryById(transaction.category_id)?.color ||
-                    '#6b7280',
+                    getCategoryByIdFromRealData(transaction.category_id)
+                      ?.color || '#6b7280',
                 }"
                 class="w-3 h-12 rounded-full flex-shrink-0"
               ></div>
@@ -442,7 +478,7 @@ const summary = computed(() => {
                   <PencilIcon
                     class="w-4 h-4 inline mr-3 text-gray-300 cursor-pointer hover:text-gray-400"
                   />
-                  <button @click="deleteTransaction(transaction.id)">
+                  <button @click="deleteTransactionAction(transaction.id)">
                     <TrashIcon
                       class="w-4 h-4 inline text-red-500 hover:text-red-700 cursor-pointer"
                     />
@@ -462,8 +498,8 @@ const summary = computed(() => {
                   <span class="flex items-center">
                     <TagIcon class="w-4 h-4 mr-1" />
                     {{
-                      getCategoryById(transaction.category_id)?.name ||
-                      "Unknown Category"
+                      getCategoryByIdFromRealData(transaction.category_id)
+                        ?.name || "Unknown Category"
                     }}
                   </span>
                 </div>

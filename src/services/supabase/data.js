@@ -1,6 +1,3 @@
-// Data transaksi untuk Finance Dashboard
-// Format mata uang: Rupiah (Rp)
-
 export const categoriesData = [
   // Expense Categories
   {

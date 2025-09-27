@@ -9,38 +9,37 @@ import RadioGroup from "../components/View/RadioGroup.vue";
 import ButtonForm from "../components/View/ButtonForm.vue";
 import { ref, watch, computed } from "vue";
 import { PlusIcon, XMarkIcon } from "@heroicons/vue/24/outline";
-import { getCategoryByType, formatCurrency } from "../services/supabase/data";
 import { useUserData } from "../composables/useData";
 import { useToast } from "../composables/useToast";
-import { useTransactions } from "../composables/useTransaction";
+import { useTransactions } from "../composables/useTransactions";
+import { useCategories } from "../composables/useCategories";
+import { watchUserAndFetchCategories } from "@/constants/watchers";
+import {
+  TRANSACTION_TYPE_OPTIONS,
+  getDefaultTransaction,
+} from "@/constants/forms";
 
 const { user, isLoggedIn } = useUserData();
 const { toast } = useToast();
 const { createTransaction } = useTransactions();
+const { categories, fetchCategories } = useCategories();
 
-const form = ref({
-  amount: "",
-  description: "",
-  category: "",
-  type: "expense", // 'expense' or 'income'
-  date: new Date().toISOString().split("T")[0],
-});
+// Fetch categories when user is available
+watchUserAndFetchCategories(user, isLoggedIn, fetchCategories);
+
+const form = ref(getDefaultTransaction());
 
 // Transaction type options
-const transactionTypes = ref([
-  {
-    value: "expense",
-    label: "Expense",
-  },
-  {
-    value: "income",
-    label: "Income",
-  },
-]);
+const transactionTypes = ref(TRANSACTION_TYPE_OPTIONS);
 
-// Categories berdasarkan transaction type (reactive)
-const categories = computed(() => {
-  return getCategoryByType(form.value.type, user.value.id);
+// Filtered categories based on transaction type
+const filteredCategories = computed(() => {
+  if (!categories.value || !Array.isArray(categories.value)) {
+    return [];
+  }
+  return categories.value.filter(
+    (category) => category.type === form.value.type
+  );
 });
 
 // Watch transaction type change to reset category
@@ -83,13 +82,7 @@ const submitTransaction = async () => {
     await createTransaction(transactionData);
 
     // Reset form after successful creation
-    form.value = {
-      amount: "",
-      description: "",
-      category: "",
-      type: "expense",
-      date: new Date().toISOString().split("T")[0],
-    };
+    form.value = getDefaultTransaction();
   } catch (error) {
     console.error("Error submitting transaction:", error);
     toast.error("Failed to add transaction", {
@@ -101,13 +94,7 @@ const submitTransaction = async () => {
 };
 
 const clearForm = () => {
-  form.value = {
-    amount: "",
-    description: "",
-    category: "",
-    type: "expense",
-    date: new Date().toISOString().split("T")[0],
-  };
+  form.value = getDefaultTransaction();
 
   toast.info("Form cleared", {
     description: "All fields have been reset",
@@ -176,7 +163,7 @@ const clearForm = () => {
           <SelectForm
             id="category"
             v-model="form.category"
-            :options="categories"
+            :options="filteredCategories"
             :optionValue="'id'"
             :optionLabel="'name'"
             placeholder="Select a category"
