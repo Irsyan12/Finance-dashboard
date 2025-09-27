@@ -471,19 +471,23 @@ const summary = computed(() => {
               ></div>
 
               <!-- Transaction Details -->
-              <div>
-                <div class="flex items-center space-x-2">
+              <div class="items-center min-w-0">
+                <div class="flex items-center mb-2">
                   <h3 class="text-lg font-semibold text-gray-200 mb-1">
                     {{ transaction.description || "No description" }}
                   </h3>
-                  <PencilIcon
-                    class="w-4 h-4 inline mr-3 text-gray-300 cursor-pointer hover:text-gray-400"
-                  />
-                  <button @click="deleteTransactionAction(transaction.id)">
-                    <TrashIcon
-                      class="w-4 h-4 inline text-red-500 hover:text-red-700 cursor-pointer"
-                    />
-                  </button>
+                  <div class="ml-2">
+                    <button>
+                      <PencilIcon
+                        class="w-4 h-4 justify-center mr-3 text-gray-300 cursor-pointer hover:text-gray-400"
+                      />
+                    </button>
+                    <button @click="deleteTransactionAction(transaction.id)">
+                      <TrashIcon
+                        class="w-4 h-4 justify-center text-red-500 hover:text-red-700 cursor-pointer"
+                      />
+                    </button>
+                  </div>
                 </div>
                 <div class="flex items-center space-x-4 text-sm text-gray-400">
                   <span class="flex items-center">

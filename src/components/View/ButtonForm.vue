@@ -8,10 +8,6 @@ const props = defineProps({
     type: String,
     default: "primary", // 'primary', 'secondary', 'danger', 'success'
   },
-  size: {
-    type: String,
-    default: "md", // 'sm', 'md', 'lg'
-  },
   disabled: {
     type: Boolean,
     default: false,
@@ -45,12 +41,10 @@ const buttonClasses = () => {
   const baseClasses =
     "flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed";
 
-  // Size classes
-  const sizeClasses = {
-    sm: "px-3 py-1.5 text-sm",
-    md: "px-4 py-2 text-base",
-    lg: "px-6 py-3 text-lg",
-  };
+  // Responsive size classes - automatically adapts to device size
+  // Mobile: small, Tablet: medium, Desktop: large
+  const responsiveSizeClasses =
+    "px-3 py-1.5 text-sm sm:px-4 sm:py-2 sm:text-sm md:px-6 md:py-3 md:text-base";
 
   // Variant classes
   const variantClasses = {
@@ -64,7 +58,7 @@ const buttonClasses = () => {
   // Block class
   const blockClass = props.block ? "w-full" : "";
 
-  return `${baseClasses} ${sizeClasses[props.size]} ${
+  return `${baseClasses} ${responsiveSizeClasses} ${
     variantClasses[props.variant]
   } ${blockClass}`;
 };
@@ -80,11 +74,15 @@ const buttonClasses = () => {
     <!-- Loading Spinner -->
     <div
       v-if="loading"
-      class="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin"
+      class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 border-2 border-white border-t-transparent rounded-full animate-spin"
     ></div>
 
     <!-- Icon -->
-    <component :is="icon" v-else-if="icon" class="w-4 h-4 mr-2" />
+    <component
+      :is="icon"
+      v-else-if="icon"
+      class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2"
+    />
 
     <!-- Slot content -->
     <slot></slot>
