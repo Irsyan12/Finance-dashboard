@@ -279,251 +279,258 @@ const categoryUsageStats = computed(() => {
           </div>
         </div>
 
-        <!-- Expense Categories ------------------------------------------------------- -->
-        <div
-          v-if="isLoggedIn"
-          class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
-        >
-          <h3
-            class="text-lg font-semibold text-gray-200 mb-4 flex items-center"
-          >
-            <TagIcon class="w-5 h-5 mr-2 text-red-400" />
-            Expense Categories
-          </h3>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div
-              v-if="expenseCategories.length > 0"
-              v-for="category in expenseCategories"
-              :key="category.id"
-              class="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-gray-600 transition-colors"
-            >
-              <!-- Edit Mode -->
-              <div
-                v-if="editingCategory && editingCategory.id === category.id"
-                class="space-y-3"
-              >
-                <input
-                  v-model="editingCategory.name"
-                  type="text"
-                  class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <div class="flex flex-wrap gap-2">
-                  <button
-                    v-for="color in availableColors"
-                    :key="color"
-                    @click="editingCategory.color = color"
-                    :style="{ backgroundColor: color }"
-                    :class="[
-                      'w-6 h-6 cursor-pointer rounded-full border transition-all',
-                      editingCategory.color === color
-                        ? 'border-white scale-110'
-                        : 'border-gray-600',
-                    ]"
-                  ></button>
-                </div>
-                <div class="flex space-x-2">
-                  <button
-                    @click="saveEditCategory"
-                    class="flex items-center cursor-pointer space-x-1 px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
-                  >
-                    <CheckIcon class="w-3 h-3" />
-                    <span>Save</span>
-                  </button>
-                  <button
-                    @click="cancelEditCategory"
-                    class="flex items-center cursor-pointer space-x-1 px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700 transition-colors"
-                  >
-                    <XMarkIcon class="w-3 h-3" />
-                    <span>Cancel</span>
-                  </button>
-                </div>
-              </div>
-
-              <!-- Display Mode -->
-              <div v-else class="flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                  <div
-                    :style="{ backgroundColor: category.color }"
-                    class="w-4 h-4 rounded-full"
-                  ></div>
-                  <span class="text-gray-200 font-medium">{{
-                    category.name
-                  }}</span>
-                </div>
-                <div class="flex space-x-2">
-                  <button
-                    @click="startEditCategory(category)"
-                    class="p-1 cursor-pointer text-gray-400 hover:text-blue-400 transition-colors"
-                  >
-                    <PencilIcon class="w-4 h-4" />
-                  </button>
-                  <button
-                    @click="deleteCategory(category.id)"
-                    class="p-1 cursor-pointer text-gray-400 hover:text-red-400 transition-colors"
-                  >
-                    <TrashIcon class="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div class="space-y-4">
+          <!-- Expense Categories ------------------------------------------------------- -->
           <div
-            v-if="expenseCategories.length === 0"
-            class="text-gray-400 text-center"
+            v-if="isLoggedIn"
+            class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
           >
-            No categories found. Please add a category.
-          </div>
-        </div>
-
-        <!-- Income Categories -->
-        <div
-          v-if="isLoggedIn"
-          class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
-        >
-          <h3
-            class="text-lg font-semibold text-gray-200 mb-4 flex items-center"
-          >
-            <TagIcon class="w-5 h-5 mr-2 text-green-400" />
-            Income Categories
-          </h3>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div
-              v-if="incomeCategories.length > 0"
-              v-for="category in incomeCategories"
-              :key="category.id"
-              class="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-gray-600 transition-colors"
+            <h3
+              class="text-lg font-semibold text-gray-200 mb-4 flex items-center"
             >
-              <!-- Edit Mode -->
+              <TagIcon class="w-5 h-5 mr-2 text-red-400" />
+              Expense Categories
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div
-                v-if="editingCategory && editingCategory.id === category.id"
-                class="space-y-3"
+                v-if="expenseCategories.length > 0"
+                v-for="category in expenseCategories"
+                :key="category.id"
+                class="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-gray-600 transition-colors"
               >
-                <input
-                  v-model="editingCategory.name"
-                  type="text"
-                  class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <div class="flex flex-wrap gap-2">
-                  <button
-                    v-for="color in availableColors"
-                    :key="color"
-                    @click="editingCategory.color = color"
-                    :style="{ backgroundColor: color }"
-                    :class="[
-                      'w-6 h-6 rounded-full border transition-all',
-                      editingCategory.color === color
-                        ? 'border-white scale-110'
-                        : 'border-gray-600',
-                    ]"
-                  ></button>
-                </div>
-                <div class="flex space-x-2">
-                  <button
-                    @click="saveEditCategory"
-                    class="flex cursor-pointer items-center space-x-1 px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
-                  >
-                    <CheckIcon class="w-3 h-3" />
-                    <span>Save</span>
-                  </button>
-                  <button
-                    @click="cancelEditCategory"
-                    class="flex cursor-pointer items-center space-x-1 px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700 transition-colors"
-                  >
-                    <XMarkIcon class="w-3 h-3" />
-                    <span>Cancel</span>
-                  </button>
-                </div>
-              </div>
-
-              <!-- Display Mode -->
-              <div v-else class="flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                  <div
-                    :style="{ backgroundColor: category.color }"
-                    class="w-4 h-4 rounded-full"
-                  ></div>
-                  <span class="text-gray-200 font-medium">{{
-                    category.name
-                  }}</span>
-                </div>
-                <div class="flex space-x-2">
-                  <button
-                    @click="startEditCategory(category)"
-                    class="p-1 cursor-pointer text-gray-400 hover:text-blue-400 transition-colors"
-                  >
-                    <PencilIcon class="w-4 h-4" />
-                  </button>
-                  <button
-                    @click="deleteCategory(category.id)"
-                    class="p-1 cursor-pointer text-gray-400 hover:text-red-400 transition-colors"
-                  >
-                    <TrashIcon class="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div
-            v-if="incomeCategories.length === 0"
-            class="text-gray-400 text-center"
-          >
-            No categories found. Please add a category.
-          </div>
-        </div>
-
-        <!-- Usage Statistics -->
-        <div
-          v-if="isLoggedIn"
-          class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
-        >
-          <h3 class="text-lg font-semibold text-gray-200 mb-4">
-            Category Usage
-          </h3>
-
-          <div v-if="categoryUsageStats.length === 0" class="text-center py-8">
-            <p class="text-gray-400">
-              No transaction data available for category usage statistics.
-            </p>
-          </div>
-
-          <div v-else class="space-y-3">
-            <div
-              v-for="stat in categoryUsageStats"
-              :key="stat.id"
-              class="flex justify-between items-center py-2 border-b border-gray-800 last:border-b-0"
-            >
-              <div class="flex items-center space-x-3">
+                <!-- Edit Mode -->
                 <div
-                  :style="{ backgroundColor: stat.color }"
-                  class="w-3 h-3 rounded-full"
-                ></div>
-                <span class="text-gray-300">{{ stat.name }}</span>
-                <span
-                  :class="[
-                    'text-xs px-2 py-1 rounded-full',
-                    stat.type === 'income'
-                      ? 'bg-green-900/30 text-green-400'
-                      : 'bg-red-900/30 text-red-400',
-                  ]"
+                  v-if="editingCategory && editingCategory.id === category.id"
+                  class="space-y-3"
                 >
-                  {{ stat.type }}
-                </span>
-              </div>
-              <div class="flex items-center space-x-2">
-                <div class="w-20 bg-gray-700 rounded-full h-2">
-                  <div
-                    :style="{
-                      backgroundColor: stat.color,
-                      width: `${Math.max(stat.percentage, 5)}%`,
-                    }"
-                    class="h-2 rounded-full transition-all duration-300"
-                  ></div>
+                  <input
+                    v-model="editingCategory.name"
+                    type="text"
+                    class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <div class="flex flex-wrap gap-2">
+                    <button
+                      v-for="color in availableColors"
+                      :key="color"
+                      @click="editingCategory.color = color"
+                      :style="{ backgroundColor: color }"
+                      :class="[
+                        'w-6 h-6 cursor-pointer rounded-full border transition-all',
+                        editingCategory.color === color
+                          ? 'border-white scale-110'
+                          : 'border-gray-600',
+                      ]"
+                    ></button>
+                  </div>
+                  <div class="flex space-x-2">
+                    <button
+                      @click="saveEditCategory"
+                      class="flex items-center cursor-pointer space-x-1 px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
+                    >
+                      <CheckIcon class="w-3 h-3" />
+                      <span>Save</span>
+                    </button>
+                    <button
+                      @click="cancelEditCategory"
+                      class="flex items-center cursor-pointer space-x-1 px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700 transition-colors"
+                    >
+                      <XMarkIcon class="w-3 h-3" />
+                      <span>Cancel</span>
+                    </button>
+                  </div>
                 </div>
-                <span class="text-sm text-gray-400 w-20 text-right">
-                  {{ stat.count }} transaction{{ stat.count === 1 ? "" : "s" }}
-                </span>
+
+                <!-- Display Mode -->
+                <div v-else class="flex items-center justify-between">
+                  <div class="flex items-center space-x-3">
+                    <div
+                      :style="{ backgroundColor: category.color }"
+                      class="w-4 h-4 rounded-full"
+                    ></div>
+                    <span class="text-gray-200 font-medium">{{
+                      category.name
+                    }}</span>
+                  </div>
+                  <div class="flex space-x-2">
+                    <button
+                      @click="startEditCategory(category)"
+                      class="p-1 cursor-pointer text-gray-400 hover:text-blue-400 transition-colors"
+                    >
+                      <PencilIcon class="w-4 h-4" />
+                    </button>
+                    <button
+                      @click="deleteCategory(category.id)"
+                      class="p-1 cursor-pointer text-gray-400 hover:text-red-400 transition-colors"
+                    >
+                      <TrashIcon class="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              v-if="expenseCategories.length === 0"
+              class="text-gray-400 text-center"
+            >
+              No categories found. Please add a category.
+            </div>
+          </div>
+
+          <!-- Income Categories -->
+          <div
+            v-if="isLoggedIn"
+            class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
+          >
+            <h3
+              class="text-lg font-semibold text-gray-200 mb-4 flex items-center"
+            >
+              <TagIcon class="w-5 h-5 mr-2 text-green-400" />
+              Income Categories
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div
+                v-if="incomeCategories.length > 0"
+                v-for="category in incomeCategories"
+                :key="category.id"
+                class="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-gray-600 transition-colors"
+              >
+                <!-- Edit Mode -->
+                <div
+                  v-if="editingCategory && editingCategory.id === category.id"
+                  class="space-y-3"
+                >
+                  <input
+                    v-model="editingCategory.name"
+                    type="text"
+                    class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <div class="flex flex-wrap gap-2">
+                    <button
+                      v-for="color in availableColors"
+                      :key="color"
+                      @click="editingCategory.color = color"
+                      :style="{ backgroundColor: color }"
+                      :class="[
+                        'w-6 h-6 rounded-full border transition-all',
+                        editingCategory.color === color
+                          ? 'border-white scale-110'
+                          : 'border-gray-600',
+                      ]"
+                    ></button>
+                  </div>
+                  <div class="flex space-x-2">
+                    <button
+                      @click="saveEditCategory"
+                      class="flex cursor-pointer items-center space-x-1 px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
+                    >
+                      <CheckIcon class="w-3 h-3" />
+                      <span>Save</span>
+                    </button>
+                    <button
+                      @click="cancelEditCategory"
+                      class="flex cursor-pointer items-center space-x-1 px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700 transition-colors"
+                    >
+                      <XMarkIcon class="w-3 h-3" />
+                      <span>Cancel</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Display Mode -->
+                <div v-else class="flex items-center justify-between">
+                  <div class="flex items-center space-x-3">
+                    <div
+                      :style="{ backgroundColor: category.color }"
+                      class="w-4 h-4 rounded-full"
+                    ></div>
+                    <span class="text-gray-200 font-medium">{{
+                      category.name
+                    }}</span>
+                  </div>
+                  <div class="flex space-x-2">
+                    <button
+                      @click="startEditCategory(category)"
+                      class="p-1 cursor-pointer text-gray-400 hover:text-blue-400 transition-colors"
+                    >
+                      <PencilIcon class="w-4 h-4" />
+                    </button>
+                    <button
+                      @click="deleteCategory(category.id)"
+                      class="p-1 cursor-pointer text-gray-400 hover:text-red-400 transition-colors"
+                    >
+                      <TrashIcon class="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              v-if="incomeCategories.length === 0"
+              class="text-gray-400 text-center"
+            >
+              No categories found. Please add a category.
+            </div>
+          </div>
+
+          <!-- Usage Statistics -->
+          <div
+            v-if="isLoggedIn"
+            class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
+          >
+            <h3 class="text-lg font-semibold text-gray-200 mb-4">
+              Category Usage
+            </h3>
+
+            <div
+              v-if="categoryUsageStats.length === 0"
+              class="text-center py-8"
+            >
+              <p class="text-gray-400">
+                No transaction data available for category usage statistics.
+              </p>
+            </div>
+
+            <div v-else class="space-y-3">
+              <div
+                v-for="stat in categoryUsageStats"
+                :key="stat.id"
+                class="flex justify-between items-center py-2 border-b border-gray-800 last:border-b-0"
+              >
+                <div class="flex items-center space-x-3">
+                  <div
+                    :style="{ backgroundColor: stat.color }"
+                    class="w-3 h-3 rounded-full"
+                  ></div>
+                  <span class="text-gray-300">{{ stat.name }}</span>
+                  <span
+                    :class="[
+                      'text-xs px-2 py-1 rounded-full',
+                      stat.type === 'income'
+                        ? 'bg-green-900/30 text-green-400'
+                        : 'bg-red-900/30 text-red-400',
+                    ]"
+                  >
+                    {{ stat.type }}
+                  </span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <div class="w-20 bg-gray-700 rounded-full h-2">
+                    <div
+                      :style="{
+                        backgroundColor: stat.color,
+                        width: `${Math.max(stat.percentage, 5)}%`,
+                      }"
+                      class="h-2 rounded-full transition-all duration-300"
+                    ></div>
+                  </div>
+                  <span class="text-sm text-gray-400 w-20 text-right">
+                    {{ stat.count }} transaction{{
+                      stat.count === 1 ? "" : "s"
+                    }}
+                  </span>
+                </div>
               </div>
             </div>
           </div>

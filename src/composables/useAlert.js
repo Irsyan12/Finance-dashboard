@@ -71,6 +71,17 @@ export const useAlert = () => {
     });
   };
 
+  const confirmLogout = (title, description) => {
+    return alert({
+      title,
+      description,
+      confirmText: "Logout",
+      cancelText: "Cancel",
+      variant: "destructive",
+      showCancel: true,
+    });
+  };
+
   /**
    * Show warning dialog
    * @param {string} title - Dialog title
@@ -148,6 +159,7 @@ export const useAlert = () => {
     alert,
     confirm,
     confirmDelete,
+    confirmLogout,
     warn,
     info,
     closeAlert,

@@ -7,9 +7,11 @@ import {
 } from "@heroicons/vue/24/outline";
 import { useUserData } from "../composables/useData";
 import { useAuthStore } from "../stores/auth";
+import { useAlert } from "../composables/useAlert";
 
 // Gunakan composable untuk user data
 const { userData, isLoggedIn } = useUserData();
+const { confirmLogout } = useAlert();
 
 // Gunakan auth store untuk logout action
 const auth = useAuthStore();
@@ -25,6 +27,24 @@ const toggleSidebar = () => {
     toggleSidebarFromParent();
   }
 };
+
+const handleLogout = async () => {
+  const confirmed = await confirmLogout(
+    "Logout",
+    `Are you sure you want to logout?`
+  );
+
+  if (confirmed) {
+    try {
+      await auth.logout();
+      isOpen.value = false; // Close mobile menu after logout
+      // go to login page
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  }
+};
 </script>
 
 <template>
@@ -33,7 +53,6 @@ const toggleSidebar = () => {
   >
     <!-- Brand & Sidebar Toggle -->
     <div class="flex items-center gap-4">
-      <router-link to="/" class="text-lg font-bold">Finance Dashboard</router-link>
       <button
         @click="toggleSidebar"
         class="p-2 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors"
@@ -42,6 +61,10 @@ const toggleSidebar = () => {
         <ChevronLeftIcon v-if="!sidebarCollapsed" class="w-5 h-5" />
         <ChevronRightIcon v-else class="w-5 h-5" />
       </button>
+      <router-link to="/" class="text-lg font-bold"
+        >Finance Dashboard</router-link
+      >
+      
     </div>
 
     <!-- Medium screen navbar -->
@@ -58,7 +81,7 @@ const toggleSidebar = () => {
           }}
         </span>
         <button
-          @click="auth.logout"
+          @click="handleLogout"
           class="flex items-center gap-2 px-2 py-2 bg-red-500 rounded hover:bg-red-600 hover:cursor-pointer transition"
         >
           <ArrowRightEndOnRectangleIcon class="h-4 w-4" />
@@ -88,7 +111,6 @@ const toggleSidebar = () => {
           }}
         </span>
       </button>
-      
     </div>
 
     <!-- Mobile dropdown menu -->
@@ -103,15 +125,13 @@ const toggleSidebar = () => {
       <div
         v-if="isOpen"
         class="md:hidden bg-gray-800 border-b border-gray-700 text-white absolute top-16 right-0 rounded-b-xl w-60 p-4 space-y-4 shadow-lg"
-        
-        >
+      >
         <div v-if="isLoggedIn" class="w-60 space-y-2">
           <span>{{ userData?.full_name }}</span>
           <button
-            @click="auth.logout"
+            @click="handleLogout"
             class="flex items-center gap-2 px-4 py-2 mt-2 bg-red-500 rounded hover:bg-red-600 transition"
-            
-            >
+          >
             <ArrowRightEndOnRectangleIcon class="h-4 w-4" />
             Logout
           </button>
