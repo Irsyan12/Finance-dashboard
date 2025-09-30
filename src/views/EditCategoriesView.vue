@@ -99,7 +99,6 @@ const deleteCategory = async (categoryId) => {
 
   if (confirmed) {
     try {
-      console.log("Deleting category with ID:", categoryId);
       await deleteCategoryAPI(categoryId);
       toast.success("Category deleted", {
         description: "The category has been successfully deleted.",

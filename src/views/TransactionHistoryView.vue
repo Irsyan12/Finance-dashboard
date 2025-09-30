@@ -81,25 +81,12 @@ const userCategories = computed(() => {
 // Helper function to get category by ID using real data
 const getCategoryByIdFromRealData = (categoryId) => {
   const category = categories.value?.find((c) => c.id === categoryId);
-  console.log("🐛 DEBUG - getCategoryByIdFromRealData:", {
-    categoryId,
-    foundCategory: category,
-    allCategories: categories.value,
-  });
   return category;
 };
 
 // Filter transactions
 const filteredTransactions = computed(() => {
-  console.log("🐛 DEBUG - Starting filter with:", {
-    userTransactions: userTransactions.value?.length || 0,
-    categories: categories.value?.length || 0,
-    filtersActive: filters.value,
-  });
-
   let result = [...(userTransactions.value || [])];
-
-  console.log("🐛 DEBUG - Initial result count:", result.length);
 
   // Filter by type
   if (filters.value.type !== "all") {
@@ -169,12 +156,6 @@ const filteredTransactions = computed(() => {
     const searchLower = filters.value.searchText.toLowerCase();
     result = result.filter((t) => {
       const category = getCategoryByIdFromRealData(t.category_id);
-      console.log("🐛 DEBUG - Transaction search:", {
-        transactionId: t.id,
-        categoryId: t.category_id,
-        foundCategory: category,
-        description: t.description,
-      });
 
       return (
         t.description?.toLowerCase().includes(searchLower) ||

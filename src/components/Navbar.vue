@@ -33,7 +33,7 @@ const toggleSidebar = () => {
   >
     <!-- Brand & Sidebar Toggle -->
     <div class="flex items-center gap-4">
-      <a href="/" class="text-lg font-bold">Finance Dashboard</a>
+      <router-link to="/" class="text-lg font-bold">Finance Dashboard</router-link>
       <button
         @click="toggleSidebar"
         class="p-2 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors"

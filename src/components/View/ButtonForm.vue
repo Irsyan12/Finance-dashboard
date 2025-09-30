@@ -41,7 +41,6 @@ const buttonClasses = () => {
   const baseClasses =
     "flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed";
 
-  // Responsive size classes - automatically adapts to device size
   // Mobile: small, Tablet: medium, Desktop: large
   const responsiveSizeClasses =
     "px-3 py-1.5 text-sm sm:px-4 sm:py-2 sm:text-sm md:px-6 md:py-3 md:text-base";

@@ -38,24 +38,82 @@ const isLoading = computed(() => {
   return categoriesLoading.value || transactionsLoading.value || !user.value;
 });
 
-const selectedPeriod = ref("month");
+const selectedPeriod = ref("all");
+
+// Helper function to filter transactions by period
+const filterTransactionsByPeriod = (transactions, period) => {
+  if (!transactions || !transactions.length) return [];
+
+  const now = new Date();
+  const startOfToday = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate()
+  );
+
+  return transactions.filter((transaction) => {
+    const transactionDate = new Date(transaction.date);
+
+    switch (period) {
+      case "all":
+        return true;
+
+      case "week": {
+        const startOfWeek = new Date(startOfToday);
+        startOfWeek.setDate(startOfToday.getDate() - startOfToday.getDay());
+        return transactionDate >= startOfWeek;
+      }
+
+      case "month": {
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        return transactionDate >= startOfMonth;
+      }
+
+      case "quarter": {
+        const currentQuarter = Math.floor(now.getMonth() / 3);
+        const startOfQuarter = new Date(
+          now.getFullYear(),
+          currentQuarter * 3,
+          1
+        );
+        return transactionDate >= startOfQuarter;
+      }
+
+      case "year": {
+        const startOfYear = new Date(now.getFullYear(), 0, 1);
+        return transactionDate >= startOfYear;
+      }
+
+      default:
+        return true;
+    }
+  });
+};
+
+// Filtered transactions based on selected period
+const filteredTransactions = computed(() => {
+  return filterTransactionsByPeriod(
+    userTransactions.value,
+    selectedPeriod.value
+  );
+});
 
 // Helper function to get category by ID using real data
 const getCategoryByIdFromRealData = (categoryId) => {
   return categories.value?.find((c) => c.id === categoryId);
 };
 
-// Computed values
+// Computed values - Updated to use filtered transactions
 const totalIncome = computed(() => {
-  if (!userTransactions.value.length) return 0;
-  return userTransactions.value
+  if (!filteredTransactions.value.length) return 0;
+  return filteredTransactions.value
     .filter((t) => t.type === "income")
     .reduce((sum, t) => sum + (t.amount || 0), 0);
 });
 
 const totalExpenses = computed(() => {
-  if (!userTransactions.value.length) return 0;
-  return userTransactions.value
+  if (!filteredTransactions.value.length) return 0;
+  return filteredTransactions.value
     .filter((t) => t.type === "expense")
     .reduce((sum, t) => sum + (t.amount || 0), 0);
 });
@@ -63,25 +121,15 @@ const totalExpenses = computed(() => {
 const balance = computed(() => totalIncome.value - totalExpenses.value);
 
 const expensesByCategory = computed(() => {
-  if (!userTransactions.value.length || !categories.value) return [];
+  if (!filteredTransactions.value.length || !categories.value) return [];
   const categoryTotals = {};
 
-  console.log(
-    "Processing expenses by category:",
-    userTransactions.value.filter((t) => t.type === "expense").length,
-    "expense transactions"
-  );
-
-  userTransactions.value
+  filteredTransactions.value
     .filter((t) => t.type === "expense")
     .forEach((t) => {
       const category = getCategoryByIdFromRealData(t.category_id);
       const categoryName = category?.name || "Unknown Category";
 
-      console.log(
-        `Expense transaction ${t.id}: category_id=${t.category_id}, found category:`,
-        category
-      );
 
       categoryTotals[categoryName] =
         (categoryTotals[categoryName] || 0) + (t.amount || 0);
@@ -92,25 +140,14 @@ const expensesByCategory = computed(() => {
 });
 
 const incomeByCategory = computed(() => {
-  if (!userTransactions.value.length || !categories.value) return [];
+  if (!filteredTransactions.value.length || !categories.value) return [];
   const categoryTotals = {};
 
-  console.log(
-    "Processing income by category:",
-    userTransactions.value.filter((t) => t.type === "income").length,
-    "income transactions"
-  );
-
-  userTransactions.value
+  filteredTransactions.value
     .filter((t) => t.type === "income")
     .forEach((t) => {
       const category = getCategoryByIdFromRealData(t.category_id);
       const categoryName = category?.name || "Unknown Category";
-
-      console.log(
-        `Income transaction ${t.id}: category_id=${t.category_id}, found category:`,
-        category
-      );
 
       categoryTotals[categoryName] =
         (categoryTotals[categoryName] || 0) + (t.amount || 0);
@@ -124,6 +161,25 @@ const savingsRate = computed(() => {
   if (totalIncome.value === 0) return 0;
   return ((balance.value / totalIncome.value) * 100).toFixed(1);
 });
+
+// Recent transactions from filtered data
+const recentFilteredTransactions = computed(() => {
+  return filteredTransactions.value
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .slice(0, 5);
+});
+
+// Helper to get period display name
+const getPeriodDisplayName = (period) => {
+  const names = {
+    all: "All Time",
+    week: "This Week",
+    month: "This Month",
+    quarter: "This Quarter",
+    year: "This Year",
+  };
+  return names[period] || period;
+};
 </script>
 
 <template>
@@ -133,7 +189,9 @@ const savingsRate = computed(() => {
       <div class="flex justify-between items-center">
         <Header
           title="Financial Summary"
-          subtitle="Overview of your finances"
+          :subtitle="`Overview of your finances - ${getPeriodDisplayName(
+            selectedPeriod
+          )}`"
         />
 
         <!-- Period Selector -->
@@ -141,8 +199,9 @@ const savingsRate = computed(() => {
           <CalendarIcon class="w-5 h-5 text-gray-400" />
           <select
             v-model="selectedPeriod"
-            class="bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
+            class="bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none min-w-0 text-sm sm:text-base"
           >
+            <option value="all">All Time</option>
             <option value="week">This Week</option>
             <option value="month">This Month</option>
             <option value="quarter">This Quarter</option>
@@ -262,6 +321,12 @@ const savingsRate = computed(() => {
                 </div>
               </div>
             </div>
+            <div
+              v-if="expensesByCategory.length === 0"
+              class="text-center py-3 text-gray-500"
+            >
+              <p>No expenses recorded for this period.</p>
+            </div>
           </div>
 
           <!-- Income by Category -->
@@ -294,6 +359,12 @@ const savingsRate = computed(() => {
                   >
                 </div>
               </div>
+              <div
+              v-if="incomeByCategory.length === 0"
+              class="text-center py-3 text-gray-500"
+            >
+              <p>No expenses recorded for this period.</p>
+            </div>
             </div>
           </div>
         </div>
@@ -304,11 +375,11 @@ const savingsRate = computed(() => {
           class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800 mt-6"
         >
           <h3 class="text-lg font-semibold text-gray-200 mb-4">
-            Recent Transactions
+            Recent Transactions ({{ getPeriodDisplayName(selectedPeriod) }})
           </h3>
           <div class="space-y-3">
             <div
-              v-for="transaction in recentTransactions"
+              v-for="transaction in recentFilteredTransactions"
               :key="transaction.id"
               class="flex justify-between items-center py-3 border-b border-gray-800 last:border-b-0"
             >
@@ -352,9 +423,28 @@ const savingsRate = computed(() => {
                 }}{{ formatCurrency(transaction.amount) }}
               </span>
             </div>
-            <router-link to="/history" class="text-blue-400 hover:text-blue-500"
-              >See More</router-link
+
+            <!-- Empty state for no transactions -->
+            <div
+              v-if="recentFilteredTransactions.length === 0"
+              class="text-center py-8 text-gray-500"
             >
+              <p>
+                No transactions found for
+                {{ getPeriodDisplayName(selectedPeriod).toLowerCase() }}
+              </p>
+              <p class="text-sm mt-1">
+                Try selecting a different period or add some transactions
+              </p>
+            </div>
+
+            <router-link
+              v-if="recentFilteredTransactions.length > 0"
+              to="/history"
+              class="text-blue-400 hover:text-blue-500"
+            >
+              See More
+            </router-link>
           </div>
         </div>
 
@@ -364,7 +454,7 @@ const savingsRate = computed(() => {
           class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800 mt-6"
         >
           <h3 class="text-lg font-semibold text-gray-200 mb-4">
-            Financial Insights
+            Financial Insights ({{ getPeriodDisplayName(selectedPeriod) }})
           </h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="p-4 bg-blue-900/20 rounded-lg border border-blue-800">

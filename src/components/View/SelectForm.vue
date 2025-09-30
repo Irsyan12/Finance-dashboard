@@ -56,11 +56,7 @@ const handleChange = (event) => {
     }
   }
 
-  console.log("🔄 SelectForm - Value changed:", {
-    originalValue: event.target.value,
-    convertedValue: value,
-    optionValue: props.optionValue,
-  });
+  
 
   emit("update:modelValue", value);
 };

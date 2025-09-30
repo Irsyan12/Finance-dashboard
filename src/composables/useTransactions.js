@@ -3,15 +3,18 @@ import { transactionService } from "../services/supabase";
 import { useUserData } from "./useData";
 import { useToast } from "./useToast";
 import { formatCurrency } from "../services/supabase/data";
+import { useDataCache } from "./useDataCache";
 
 export const useTransactions = () => {
   const { user } = useUserData();
   const { toast } = useToast();
+  const { getCachedData, setCachedData, clearCache } = useDataCache();
+
   const transactions = ref([]);
   const loading = ref(false);
   const error = ref(null);
 
-  // Create transaction
+  // Create transaction (invalidate cache)
   const createTransaction = async (transactionData) => {
     try {
       loading.value = true;
@@ -24,7 +27,11 @@ export const useTransactions = () => {
         updated_at: new Date().toISOString(),
       });
 
+      // Add to local state
       transactions.value.unshift(newTransaction);
+
+      // Update cache
+      setCachedData("transactions", transactions.value, user.value.id);
 
       toast.success("Transaction added successfully!", {
         description: `${
@@ -44,14 +51,26 @@ export const useTransactions = () => {
     }
   };
 
-  // Fetch transactions
+  // Fetch transactions with caching
   const fetchTransactions = async (options = {}) => {
+    if (!user.value?.id) return;
+
     try {
+      // Check cache first
+      const cachedTransactions = getCachedData("transactions", user.value.id);
+      if (cachedTransactions && !options.forceRefresh) {
+        transactions.value = cachedTransactions;
+        return cachedTransactions;
+      }
+
       loading.value = true;
       error.value = null;
 
       const data = await transactionService.getByUserId(user.value.id, options);
       transactions.value = data;
+
+      // Cache the data
+      setCachedData("transactions", data, user.value.id);
 
       return data;
     } catch (err) {
@@ -86,6 +105,9 @@ export const useTransactions = () => {
         transactions.value[index] = updatedTransaction;
       }
 
+      // Update cache
+      setCachedData("transactions", transactions.value, user.value.id);
+
       toast.success("Transaction updated successfully!");
 
       return updatedTransaction;
@@ -110,6 +132,9 @@ export const useTransactions = () => {
 
       transactions.value = transactions.value.filter((t) => t.id !== id);
 
+      // Update cache
+      setCachedData("transactions", transactions.value, user.value.id);
+
       toast.success("Transaction deleted successfully!");
 
       return true;
@@ -122,6 +147,16 @@ export const useTransactions = () => {
     } finally {
       loading.value = false;
     }
+  };
+
+  // Force refresh (bypass cache)
+  const refreshTransactions = () => {
+    return fetchTransactions({ forceRefresh: true });
+  };
+
+  // Clear cache manually
+  const clearTransactionCache = () => {
+    clearCache("transactions");
   };
 
   // Computed properties
@@ -145,6 +180,8 @@ export const useTransactions = () => {
     error,
     createTransaction,
     fetchTransactions,
+    refreshTransactions,
+    clearTransactionCache,
     recentTransactions,
     updateTransaction,
     deleteTransaction,

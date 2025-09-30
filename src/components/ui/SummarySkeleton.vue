@@ -1,3 +1,12 @@
+<script setup>
+defineProps({
+  count: {
+    type: Number,
+    default: 4,
+  },
+});
+</script>
+
 <template>
   <div class="animate-pulse grid grid-cols-1 md:grid-cols-4 gap-4">
     <div
@@ -10,12 +19,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-defineProps({
-  count: {
-    type: Number,
-    default: 4,
-  },
-});
-</script>

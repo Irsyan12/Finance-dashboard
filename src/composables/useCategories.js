@@ -2,15 +2,18 @@ import { ref, computed } from "vue";
 import { categoryService } from "../services/supabase";
 import { useAuth } from "./useAuth";
 import { useToast } from "./useToast";
+import { useDataCache } from "./useDataCache";
 
 export const useCategories = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { getCachedData, setCachedData, clearCache } = useDataCache();
+
   const categories = ref([]);
   const loading = ref(false);
   const error = ref(null);
 
-  // Create category
+  // Create category (update cache)
   const createCategory = async (categoryData) => {
     try {
       loading.value = true;
@@ -30,34 +33,53 @@ export const useCategories = () => {
 
       categories.value.push(newCategory);
 
+      // Update cache
+      setCachedData("categories", categories.value, user.value.id);
+
+      toast.success("Category created successfully!");
       return newCategory;
     } catch (err) {
       error.value = err.message;
+      toast.error("Failed to create category", {
+        description: err.message,
+      });
       throw err;
     } finally {
       loading.value = false;
     }
   };
 
-  // Fetch categories
-  const fetchCategories = async () => {
+  // Fetch categories with caching
+  const fetchCategories = async (options = {}) => {
+    if (!user.value?.id) {
+      console.warn("No user available for fetching categories");
+      return [];
+    }
+
     try {
+      // Check cache first
+      const cachedCategories = getCachedData("categories", user.value.id);
+      if (cachedCategories && !options.forceRefresh) {
+        categories.value = cachedCategories;
+        return cachedCategories;
+      }
+
       loading.value = true;
       error.value = null;
 
-      // Safe check for user
-      if (!user.value || !user.value.id) {
-        console.warn("No user available for fetching categories");
-        return [];
-      }
-
       const data = await categoryService.getByUserId(user.value.id);
       categories.value = data || [];
+
+      // Cache the data
+      setCachedData("categories", data || [], user.value.id);
 
       return data || [];
     } catch (err) {
       error.value = err.message;
       categories.value = []; // Reset to empty array on error
+      toast.error("Failed to fetch categories", {
+        description: err.message,
+      });
       throw err;
     } finally {
       loading.value = false;
@@ -91,6 +113,10 @@ export const useCategories = () => {
         categories.value[index] = updatedCategory;
       }
 
+      // Update cache
+      setCachedData("categories", categories.value, user.value.id);
+
+      toast.success("Category updated successfully!");
       return updatedCategory;
     } catch (err) {
       error.value = err.message;
@@ -110,6 +136,10 @@ export const useCategories = () => {
 
       categories.value = categories.value.filter((c) => c.id !== id);
 
+      // Update cache
+      setCachedData("categories", categories.value, user.value.id);
+
+      toast.success("Category deleted successfully!");
       return true;
     } catch (err) {
       error.value = err.message;
@@ -117,6 +147,16 @@ export const useCategories = () => {
     } finally {
       loading.value = false;
     }
+  };
+
+  // Force refresh (bypass cache)
+  const refreshCategories = () => {
+    return fetchCategories({ forceRefresh: true });
+  };
+
+  // Clear cache manually
+  const clearCategoryCache = () => {
+    clearCache("categories");
   };
 
   // Get category by ID
@@ -139,6 +179,8 @@ export const useCategories = () => {
     error,
     createCategory,
     fetchCategories,
+    refreshCategories,
+    clearCategoryCache,
     getCategoriesByType,
     updateCategory,
     deleteCategory,
