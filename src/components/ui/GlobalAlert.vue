@@ -11,7 +11,7 @@
 
     <!-- Dialog -->
     <div
-      class="relative bg-white/5 border border-gray-800 rounded-lg shadow-xl p-6 max-w-md w-full mx-4"
+      class="relative bg-slate-950 border border-gray-800 rounded-lg shadow-xl p-6 max-w-md w-full mx-4"
     >
       <!-- Header -->
       <div class="mb-4">
