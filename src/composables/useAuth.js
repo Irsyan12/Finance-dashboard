@@ -25,6 +25,9 @@ export function useAuth() {
   const loginWithGoogle = async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
+      options: {
+        redirectTo: import.meta.env.VITE_REDIRECT_URL,
+      },
     });
     if (error) console.error(error);
     // user akan diupdate otomatis oleh onAuthStateChange

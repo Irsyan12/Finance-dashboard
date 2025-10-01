@@ -21,7 +21,7 @@ const sidebarCollapsed = inject("sidebarCollapsed", ref(false));
   <aside
     id="default-sidebar"
     :class="[
-      'fixed top-16 left-0 z-40 h-[calc(100vh-4rem)] transition-all duration-300 border-r border-gray-700 bg-gray-900',
+      'fixed top-16 left-0 z-40 h-[calc(100vh-4rem)] transition-all duration-300 border-r border-gray-700 bg-white/5',
       sidebarCollapsed ? 'w-18' : 'w-64',
       'transform', // Add transform for mobile
       // Mobile: hide by default, show when not collapsed
@@ -30,7 +30,7 @@ const sidebarCollapsed = inject("sidebarCollapsed", ref(false));
     ]"
     aria-label="Sidebar"
   >
-    <div class="h-full px-4 py-6 overflow-y-auto bg-gray-900">
+    <div class="h-full px-4 py-6 overflow-y-auto bg-gray-950">
       <!-- Navigation Menu -->
       <nav class="space-y-2">
         <router-link

@@ -130,7 +130,6 @@ const expensesByCategory = computed(() => {
       const category = getCategoryByIdFromRealData(t.category_id);
       const categoryName = category?.name || "Unknown Category";
 
-
       categoryTotals[categoryName] =
         (categoryTotals[categoryName] || 0) + (t.amount || 0);
     });
@@ -183,16 +182,25 @@ const getPeriodDisplayName = (period) => {
 </script>
 
 <template>
-  <AppLayout>
-    <div class="space-y-6">
-      <!-- Header -->
-      <div class="flex justify-between items-center">
-        <Header
-          title="Financial Summary"
-          :subtitle="`Overview of your finances - ${getPeriodDisplayName(
-            selectedPeriod
-          )}`"
-        />
+  <div
+    class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900"
+  >
+    <AppLayout>
+      <div class="space-y-8">
+        <!-- Header -->
+        <div
+          class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4"
+        >
+          <div
+            class="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-white/10 flex-1"
+          >
+            <Header
+              title="Financial Summary"
+              :subtitle="`Overview of your finances - ${getPeriodDisplayName(
+                selectedPeriod
+              )}`"
+            />
+          </div>
 
         <!-- Period Selector -->
         <div class="flex items-center space-x-2">
@@ -216,8 +224,11 @@ const getPeriodDisplayName = (period) => {
         <div v-if="isLoggedIn" class="grid grid-cols-1 md:grid-cols-4 gap-6">
           <!-- Total Income -->
           <div
-            class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
+            class="group bg-white/5 cursor-default backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.02] relative overflow-hidden"
           >
+          <div
+                class="absolute inset-0 bg-gradient-to-br from-green-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              ></div>
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm text-gray-400 mb-1">Total Income</p>
@@ -231,264 +242,367 @@ const getPeriodDisplayName = (period) => {
             </div>
           </div>
 
-          <!-- Total Expenses -->
-          <div
-            class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
-          >
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-sm text-gray-400 mb-1">Total Expenses</p>
-                <p class="text-xl font-bold text-red-400">
-                  {{ formatCurrency(totalExpenses) }}
-                </p>
-              </div>
-              <div class="p-3 bg-red-900/20 rounded-full">
-                <ArrowDownIcon class="w-6 h-6 text-red-400" />
-              </div>
-            </div>
-          </div>
-
-          <!-- Net Balance -->
-          <div
-            class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
-          >
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-sm text-gray-400 mb-1">Net Balance</p>
-                <p
-                  class="text-xl font-bold"
-                  :class="balance >= 0 ? 'text-blue-400' : 'text-red-400'"
-                >
-                  <span>{{ formatCurrency(balance) }}</span>
-                </p>
-              </div>
-              <div class="p-3 bg-blue-900/20 rounded-full">
-                <CurrencyDollarIcon class="w-6 h-6 text-blue-400" />
-              </div>
-            </div>
-          </div>
-
-          <!-- Savings Rate -->
-          <div
-            class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
-          >
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-sm text-gray-400 mb-1">Savings Rate</p>
-                <p class="text-xl font-bold text-purple-400">
-                  {{ savingsRate }}%
-                </p>
-              </div>
-              <div class="p-3 bg-purple-900/20 rounded-full">
-                <ChartBarIcon class="w-6 h-6 text-purple-400" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Charts and Breakdowns -->
-        <div
-          v-if="isLoggedIn"
-          class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6"
-        >
-          <!-- Expenses by Category -->
-          <div
-            class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
-          >
-            <h3 class="text-lg font-semibold text-gray-200 mb-4">
-              Expenses by Category
-            </h3>
-            <div class="space-y-3">
+            <!-- Total Expenses -->
+            <div
+              class="group bg-white/5 cursor-default backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.02] relative overflow-hidden"
+            >
+              <!-- Card Background Glow -->
               <div
-                v-for="category in expensesByCategory"
-                :key="category.name"
-                class="flex items-center justify-between"
-              >
-                <span class="text-gray-300">{{ category.name }}</span>
-                <div class="flex items-center space-x-3">
-                  <div class="flex-1 bg-gray-700 rounded-full h-2 w-24">
-                    <div
-                      class="bg-red-400 h-2 rounded-full transition-all duration-300"
-                      :style="{
-                        width: `${(category.amount / totalExpenses) * 100}%`,
-                      }"
-                    ></div>
+                class="absolute inset-0 bg-gradient-to-br from-red-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              ></div>
+
+              <div class="relative z-10">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm text-gray-400 mb-2 font-medium">
+                      Total Expenses
+                    </p>
+                    <p
+                      class="text-2xl font-bold bg-gradient-to-r from-red-400 to-pink-400 bg-clip-text text-transparent"
+                    >
+                      {{ formatCurrency(totalExpenses) }}
+                    </p>
                   </div>
-                  <span
-                    class="text-red-400 font-semibold md w-14 md:w-27 text-right"
-                    >{{ formatCurrency(category.amount) }}</span
+                  <div
+                    class="p-3 bg-gradient-to-r from-red-500/20 to-pink-500/20 rounded-xl border border-red-400/30"
                   >
+                    <ArrowDownIcon class="w-6 h-6 text-red-400" />
+                  </div>
                 </div>
               </div>
             </div>
-            <div
-              v-if="expensesByCategory.length === 0"
-              class="text-center py-3 text-gray-500"
-            >
-              <p>No expenses recorded for this period.</p>
-            </div>
-          </div>
 
-          <!-- Income by Category -->
-          <div
-            class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
-          >
-            <h3 class="text-lg font-semibold text-gray-200 mb-4">
-              Income by Category
-            </h3>
-            <div class="space-y-3">
+            <!-- Net Balance -->
+            <div
+              class="group bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.02] relative overflow-hidden"
+            >
+              <!-- Card Background Glow -->
               <div
-                v-for="category in incomeByCategory"
-                :key="category.name"
-                class="flex items-center justify-between"
-              >
-                <span class="text-gray-300">{{ category.name }}</span>
-                <div class="flex items-center space-x-5">
-                  <div class="flex-1 bg-gray-700 rounded-full h-2 w-24">
-                    <div
-                      class="bg-green-400 h-2 rounded-full transition-all duration-300"
-                      :style="{
-                        width: `${(category.amount / totalIncome) * 100}%`,
-                      }"
-                    ></div>
+                class="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              ></div>
+
+              <div class="relative z-10">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm text-gray-400 mb-2 font-medium">
+                      Net Balance
+                    </p>
+                    <p
+                      class="text-2xl font-bold bg-gradient-to-r bg-clip-text text-transparent"
+                      :class="
+                        balance >= 0
+                          ? 'from-blue-400 to-cyan-400'
+                          : 'from-red-400 to-pink-400'
+                      "
+                    >
+                      {{ formatCurrency(balance) }}
+                    </p>
                   </div>
-                  <span
-                    class="text-green-400 font-semibold w-14 md:w-27 text-right"
+                  <div
+                    class="p-3 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-xl border border-blue-400/30"
                   >
-                    <span>{{ formatCurrency(category.amount) }}</span></span
-                  >
+                    <CurrencyDollarIcon class="w-6 h-6 text-blue-400" />
+                  </div>
                 </div>
               </div>
-              <div
-              v-if="incomeByCategory.length === 0"
-              class="text-center py-3 text-gray-500"
-            >
-              <p>No expenses recorded for this period.</p>
             </div>
+
+            <!-- Savings Rate -->
+            <div
+              class="group cursor-default bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.02] relative overflow-hidden"
+            >
+              <!-- Card Background Glow -->
+              <div
+                class="absolute inset-0 bg-gradient-to-br from-purple-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              ></div>
+
+              <div class="relative z-10">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm text-gray-400 mb-2 font-medium">
+                      Savings Rate
+                    </p>
+                    <p
+                      class="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"
+                    >
+                      {{ savingsRate }}%
+                    </p>
+                  </div>
+                  <div
+                    class="p-3 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl border border-purple-400/30"
+                  >
+                    <ChartBarIcon class="w-6 h-6 text-purple-400" />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Recent Transactions -->
-        <div
-          v-if="isLoggedIn"
-          class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800 mt-6"
-        >
-          <h3 class="text-lg font-semibold text-gray-200 mb-4">
-            Recent Transactions ({{ getPeriodDisplayName(selectedPeriod) }})
-          </h3>
-          <div class="space-y-3">
+          <!-- Charts and Breakdowns -->
+          <div
+            v-if="isLoggedIn"
+            class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8"
+          >
+            <!-- Expenses by Category -->
             <div
-              v-for="transaction in recentFilteredTransactions"
-              :key="transaction.id"
-              class="flex justify-between items-center py-3 border-b border-gray-800 last:border-b-0"
+              class="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-white/10 relative overflow-hidden"
             >
-              <div class="flex items-center space-x-3">
+              <!-- Background Pattern -->
+              <div class="absolute inset-0 bg-grid-pattern opacity-5"></div>
+
+              <div class="relative z-10">
+                <h3 class="text-xl font-semibold text-gray-200 mb-6">
+                  Expenses by Category
+                </h3>
+                <div class="space-y-4">
+                  <div
+                    v-for="category in expensesByCategory"
+                    :key="category.name"
+                    class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/10"
+                  >
+                    <span class="text-gray-300 font-medium">{{
+                      category.name
+                    }}</span>
+                    <div class="flex items-center space-x-4">
+                      <div class="flex-1 bg-gray-600/30 rounded-full h-2 w-32">
+                        <div
+                          class="bg-gradient-to-r from-red-400 to-pink-400 h-2 rounded-full transition-all duration-500"
+                          :style="{
+                            width: `${
+                              (category.amount / totalExpenses) * 100
+                            }%`,
+                          }"
+                        ></div>
+                      </div>
+                      <span
+                        class="text-red-400 font-bold min-w-[80px] text-right"
+                      >
+                        {{ formatCurrency(category.amount) }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
                 <div
-                  :class="[
-                    'p-2 rounded-full',
-                    transaction.type === 'income'
-                      ? 'bg-green-900/20'
-                      : 'bg-red-900/20',
-                  ]"
+                  v-if="expensesByCategory.length === 0"
+                  class="text-center py-8 text-gray-400"
                 >
-                  <ArrowUpIcon
-                    v-if="transaction.type === 'income'"
-                    class="w-4 h-4 text-green-400"
-                  />
-                  <ArrowDownIcon v-else class="w-4 h-4 text-red-400" />
+                  <p>No expenses recorded for this period.</p>
                 </div>
-                <div>
-                  <p class="font-medium text-gray-200">
-                    {{ transaction.description }}
+              </div>
+            </div>
+
+            <!-- Income by Category -->
+            <div
+              class="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-white/10 relative overflow-hidden"
+            >
+              <!-- Background Pattern -->
+              <div class="absolute inset-0 bg-grid-pattern opacity-5"></div>
+
+              <div class="relative z-10">
+                <h3 class="text-xl font-semibold text-gray-200 mb-6">
+                  Income by Category
+                </h3>
+                <div class="space-y-4">
+                  <div
+                    v-for="category in incomeByCategory"
+                    :key="category.name"
+                    class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/10"
+                  >
+                    <span class="text-gray-300 font-medium">{{
+                      category.name
+                    }}</span>
+                    <div class="flex items-center space-x-4">
+                      <div class="flex-1 bg-gray-600/30 rounded-full h-2 w-32">
+                        <div
+                          class="bg-gradient-to-r from-green-400 to-emerald-400 h-2 rounded-full transition-all duration-500"
+                          :style="{
+                            width: `${(category.amount / totalIncome) * 100}%`,
+                          }"
+                        ></div>
+                      </div>
+                      <span
+                        class="text-green-400 font-bold min-w-[80px] text-right"
+                      >
+                        {{ formatCurrency(category.amount) }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  v-if="incomeByCategory.length === 0"
+                  class="text-center py-8 text-gray-400"
+                >
+                  <p>No income recorded for this period.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Transactions -->
+          <div
+            v-if="isLoggedIn"
+            class="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-white/10 relative overflow-hidden mt-8"
+          >
+            <!-- Background Pattern -->
+            <div class="absolute inset-0 bg-grid-pattern opacity-5"></div>
+
+            <div class="relative z-10">
+              <h3 class="text-xl font-semibold text-gray-200 mb-6">
+                Recent Transactions ({{ getPeriodDisplayName(selectedPeriod) }})
+              </h3>
+              <div class="space-y-4">
+                <div
+                  v-for="transaction in recentFilteredTransactions"
+                  :key="transaction.id"
+                  class="flex justify-between items-center p-4 bg-white/5 rounded-xl border border-white/10 hover:border-white/20 transition-all duration-200"
+                >
+                  <div class="flex items-center space-x-4">
+                    <div
+                      :class="[
+                        'p-3 rounded-xl border',
+                        transaction.type === 'income'
+                          ? 'bg-green-500/20 border-green-400/30'
+                          : 'bg-red-500/20 border-red-400/30',
+                      ]"
+                    >
+                      <ArrowUpIcon
+                        v-if="transaction.type === 'income'"
+                        class="w-5 h-5 text-green-400"
+                      />
+                      <ArrowDownIcon v-else class="w-5 h-5 text-red-400" />
+                    </div>
+                    <div>
+                      <p class="font-semibold text-gray-200 text-lg">
+                        {{ transaction.description }}
+                      </p>
+                      <p class="text-sm text-gray-400">
+                        {{
+                          getCategoryByIdFromRealData(transaction.category_id)
+                            ?.name || "Unknown Category"
+                        }}
+                        • {{ formatRelativeDate(transaction.date) }}
+                      </p>
+                    </div>
+                  </div>
+                  <span
+                    :class="[
+                      'font-bold text-xl',
+                      transaction.type === 'income'
+                        ? 'text-green-400'
+                        : 'text-red-400',
+                    ]"
+                  >
+                    {{ transaction.type === "income" ? "+" : "-"
+                    }}{{ formatCurrency(transaction.amount) }}
+                  </span>
+                </div>
+
+                <!-- Empty state for no transactions -->
+                <div
+                  v-if="recentFilteredTransactions.length === 0"
+                  class="text-center py-12"
+                >
+                  <div
+                    class="w-16 h-16 mx-auto mb-4 bg-gray-600/20 rounded-2xl flex items-center justify-center"
+                  >
+                    <ChartBarIcon class="w-8 h-8 text-gray-500" />
+                  </div>
+                  <p class="text-gray-400 text-lg mb-2">
+                    No transactions found for
+                    {{ getPeriodDisplayName(selectedPeriod).toLowerCase() }}
                   </p>
-                  <p class="text-sm text-gray-500">
-                    {{
-                      getCategoryByIdFromRealData(transaction.category_id)
-                        ?.name || "Unknown Category"
-                    }}
-                    • {{ formatRelativeDate(transaction.date) }}
+                  <p class="text-gray-500 text-sm">
+                    Try selecting a different period or add some transactions
+                  </p>
+                </div>
+
+                <router-link
+                  v-if="recentFilteredTransactions.length > 0"
+                  to="/history"
+                  class="inline-flex items-center px-4 py-2 bg-blue-600/20 text-blue-400 rounded-lg hover:bg-blue-600/30 transition-colors border border-blue-400/30 mt-4"
+                >
+                  See More
+                </router-link>
+              </div>
+            </div>
+          </div>
+
+          <!-- Insights -->
+          <div
+            v-if="isLoggedIn"
+            class="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-white/10 relative overflow-hidden mt-8"
+          >
+            <!-- Background Pattern -->
+            <div class="absolute inset-0 bg-grid-pattern opacity-5"></div>
+
+            <div class="relative z-10">
+              <h3 class="text-xl font-semibold text-gray-200 mb-6">
+                Financial Insights ({{ getPeriodDisplayName(selectedPeriod) }})
+              </h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div
+                  class="p-6 bg-blue-500/10 rounded-xl border border-blue-400/30"
+                >
+                  <h4 class="font-semibold text-blue-400 mb-3">
+                    Top Spending Category
+                  </h4>
+                  <p class="text-gray-300 text-lg">
+                    {{ expensesByCategory[0]?.name || "No expenses" }}
+                  </p>
+                  <p class="text-blue-400 font-bold text-xl mt-1">
+                    {{ formatCurrency(expensesByCategory[0]?.amount || 0) }}
+                  </p>
+                </div>
+                <div
+                  class="p-6 bg-green-500/10 rounded-xl border border-green-400/30"
+                >
+                  <h4 class="font-semibold text-green-400 mb-3">
+                    Primary Income Source
+                  </h4>
+                  <p class="text-gray-300 text-lg">
+                    {{ incomeByCategory[0]?.name || "No income" }}
+                  </p>
+                  <p class="text-green-400 font-bold text-xl mt-1">
+                    {{ formatCurrency(incomeByCategory[0]?.amount || 0) }}
                   </p>
                 </div>
               </div>
-              <span
-                :class="[
-                  'font-semibold',
-                  transaction.type === 'income'
-                    ? 'text-green-400'
-                    : 'text-red-400',
-                ]"
-              >
-                {{ transaction.type === "income" ? "+" : "-"
-                }}{{ formatCurrency(transaction.amount) }}
-              </span>
             </div>
-
-            <!-- Empty state for no transactions -->
-            <div
-              v-if="recentFilteredTransactions.length === 0"
-              class="text-center py-8 text-gray-500"
-            >
-              <p>
-                No transactions found for
-                {{ getPeriodDisplayName(selectedPeriod).toLowerCase() }}
-              </p>
-              <p class="text-sm mt-1">
-                Try selecting a different period or add some transactions
-              </p>
-            </div>
-
-            <router-link
-              v-if="recentFilteredTransactions.length > 0"
-              to="/history"
-              class="text-blue-400 hover:text-blue-500"
-            >
-              See More
-            </router-link>
           </div>
         </div>
 
-        <!-- Insights -->
         <div
-          v-if="isLoggedIn"
-          class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800 mt-6"
+          v-if="!isLoggedIn"
+          class="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl p-12 border border-white/10 text-center mt-8"
         >
-          <h3 class="text-lg font-semibold text-gray-200 mb-4">
-            Financial Insights ({{ getPeriodDisplayName(selectedPeriod) }})
-          </h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="p-4 bg-blue-900/20 rounded-lg border border-blue-800">
-              <h4 class="font-medium text-blue-400 mb-2">
-                Top Spending Category
-              </h4>
-              <p class="text-gray-300">
-                {{ expensesByCategory[0]?.name || "No expenses" }} -
-                {{ formatCurrency(expensesByCategory[0]?.amount || 0) }}
-              </p>
-            </div>
-            <div class="p-4 bg-green-900/20 rounded-lg border border-green-800">
-              <h4 class="font-medium text-green-400 mb-2">
-                Primary Income Source
-              </h4>
-              <p class="text-gray-300">
-                {{ incomeByCategory[0]?.name || "No income" }} -
-                {{ formatCurrency(incomeByCategory[0]?.amount || 0) }}
-              </p>
-            </div>
+          <div class="text-gray-400 text-xl">
+            Please log in to view your transaction history.
           </div>
         </div>
       </div>
-
-      <div
-        v-if="!isLoggedIn"
-        class="bg-gray-900 rounded-lg p-8 mt-6 text-center border border-gray-800"
-      >
-        <div class="text-gray-400 text-lg">
-          Please log in to view your transaction history.
-        </div>
-      </div>
-    </div>
-  </AppLayout>
+    </AppLayout>
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+/* Grid Pattern Background */
+.bg-grid-pattern {
+  background-image: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.1) 1px,
+    transparent 1px
+  );
+  background-size: 20px 20px;
+}
+
+/* Glassmorphism effect */
+.backdrop-blur-xl {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Smooth transitions */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+</style>

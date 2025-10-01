@@ -198,32 +198,38 @@ const summary = computed(() => {
   <AppLayout>
     <div class="space-y-6">
       <!-- Header -->
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between">
-        <Header
-          title="Transaction History"
-          subtitle="Review and manage your past transactions"
-        />
-
-        <!-- Toggle Filters Button -->
-        <button
-          @click="showFilters = !showFilters"
-          class="w-32 ms-auto mt-2 flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+      <div
+        class="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-white/10 flex-1"
+      >
+        <div
+          class="flex flex-col md:flex-row md:items-center md:justify-between"
         >
-          <FunnelIcon class="w-4 h-4" />
-          <span>Filters</span>
-          <ChevronDownIcon
-            :class="[
-              'w-4 h-4 transition-transform',
-              showFilters ? 'rotate-180' : '',
-            ]"
+          <Header
+            title="Transaction History"
+            subtitle="Review and manage your past transactions"
           />
-        </button>
+
+          <!-- Toggle Filters Button -->
+          <button
+            @click="showFilters = !showFilters"
+            class="w-32 ms-auto mt-2 flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <FunnelIcon class="w-4 h-4" />
+            <span>Filters</span>
+            <ChevronDownIcon
+              :class="[
+                'w-4 h-4 transition-transform',
+                showFilters ? 'rotate-180' : '',
+              ]"
+            />
+          </button>
+        </div>
       </div>
 
       <!-- Filters Panel -->
       <div
         v-if="showFilters"
-        class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
+        class="bg-white/5 rounded-lg shadow-lg p-6 border border-gray-800"
       >
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold text-gray-200">
@@ -373,23 +379,23 @@ const summary = computed(() => {
 
         <!-- Real Summary Statistics -->
         <div v-else class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div class="bg-gray-900 rounded-lg p-4 border border-gray-800">
+          <div class="bg-white/5 rounded-lg p-4 border border-gray-800">
             <div class="text-sm text-gray-400 mb-1">Total Transactions</div>
             <div class="text-2xl font-bold text-white">{{ summary.count }}</div>
           </div>
-          <div class="bg-gray-900 rounded-lg p-4 border border-gray-800">
+          <div class="bg-white/5 rounded-lg p-4 border border-gray-800">
             <div class="text-sm text-gray-400 mb-1">Total Income</div>
             <div class="text-2xl font-bold text-green-400">
               +{{ formatCurrency(summary.income) }}
             </div>
           </div>
-          <div class="bg-gray-900 rounded-lg p-4 border border-gray-800">
+          <div class="bg-white/5 rounded-lg p-4 border border-gray-800">
             <div class="text-sm text-gray-400 mb-1">Total Expense</div>
             <div class="text-2xl font-bold text-red-400">
               -{{ formatCurrency(summary.expense) }}
             </div>
           </div>
-          <div class="bg-gray-900 rounded-lg p-4 border border-gray-800">
+          <div class="bg-white/5 rounded-lg p-4 border border-gray-800">
             <div class="text-sm text-gray-400 mb-1">Net Balance</div>
             <div
               :class="[
@@ -407,7 +413,7 @@ const summary = computed(() => {
       <!-- Transaction List -->
       <div
         v-if="!isLoggedIn"
-        class="bg-gray-900 rounded-lg p-8 text-center border border-gray-800"
+        class="bg-white/5 rounded-lg p-8 text-center border border-gray-800"
       >
         <div class="text-gray-400 text-lg">
           Please log in to view your transaction history.
@@ -419,7 +425,7 @@ const summary = computed(() => {
 
       <div
         v-else-if="filteredTransactions.length === 0"
-        class="bg-gray-900 rounded-lg p-8 text-center border border-gray-800"
+        class="bg-white/5 rounded-lg p-8 text-center border border-gray-800"
       >
         <div class="text-gray-400 text-lg">
           No transactions found matching your filters.
@@ -436,7 +442,7 @@ const summary = computed(() => {
         <div
           v-for="(transaction, index) in filteredTransactions"
           :key="transaction.id"
-          class="bg-gray-900 rounded-lg p-4 border border-gray-800 hover:border-gray-700 transition-all duration-200 hover:shadow-lg"
+          class="bg-white/5 rounded-lg p-4 border border-gray-800 hover:border-gray-700 transition-all duration-200 hover:shadow-lg"
         >
           <div class="flex items-center justify-between">
             <!-- Left side - Transaction Info -->

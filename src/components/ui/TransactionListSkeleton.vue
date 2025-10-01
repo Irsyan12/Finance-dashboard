@@ -3,7 +3,7 @@
     <div
       v-for="n in count"
       :key="n"
-      class="bg-gray-900 rounded-lg p-4 border border-gray-800"
+      class="bg-white/5 rounded-lg p-4 border border-gray-800"
     >
       <div class="flex items-center justify-between">
         <!-- Left side -->

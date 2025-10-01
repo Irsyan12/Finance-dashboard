@@ -39,7 +39,7 @@ const handleClick = (event) => {
 // Computed classes
 const buttonClasses = () => {
   const baseClasses =
-    "flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed";
+    "flex cursor-pointer items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed";
 
   // Mobile: small, Tablet: medium, Desktop: large
   const responsiveSizeClasses =

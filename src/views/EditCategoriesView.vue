@@ -172,10 +172,14 @@ const categoryUsageStats = computed(() => {
   <AppLayout>
     <div class="space-y-6">
       <!-- Header -->
-      <Header
-        title="Manage Categories"
-        subtitle="Organize your transaction categories"
-      />
+      <div
+        class="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-white/10 flex-1"
+      >
+        <Header
+          title="Manage Categories"
+          subtitle="Organize your transaction categories"
+        />
+      </div>
 
       <!-- Loading Skeleton -->
       <div v-if="isLoading">
@@ -187,7 +191,7 @@ const categoryUsageStats = computed(() => {
         <!-- Add New Category -->
         <div
           v-if="isLoggedIn"
-          class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800 mb-6"
+          class="bg-white/5 rounded-lg shadow-lg p-6 border border-gray-800 mb-6"
         >
           <div
             v-if="!isAddingCategory"
@@ -283,7 +287,7 @@ const categoryUsageStats = computed(() => {
           <!-- Expense Categories ------------------------------------------------------- -->
           <div
             v-if="isLoggedIn"
-            class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
+            class="bg-white/5 rounded-lg shadow-lg p-6 border border-gray-800"
           >
             <h3
               class="text-lg font-semibold text-gray-200 mb-4 flex items-center"
@@ -380,7 +384,7 @@ const categoryUsageStats = computed(() => {
           <!-- Income Categories -->
           <div
             v-if="isLoggedIn"
-            class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
+            class="bg-white/5 rounded-lg shadow-lg p-6 border border-gray-800"
           >
             <h3
               class="text-lg font-semibold text-gray-200 mb-4 flex items-center"
@@ -477,7 +481,7 @@ const categoryUsageStats = computed(() => {
           <!-- Usage Statistics -->
           <div
             v-if="isLoggedIn"
-            class="bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
+            class="bg-white/5 rounded-lg shadow-lg p-6 border border-gray-800"
           >
             <h3 class="text-lg font-semibold text-gray-200 mb-4">
               Category Usage
@@ -538,7 +542,7 @@ const categoryUsageStats = computed(() => {
 
         <div
           v-if="!isLoggedIn"
-          class="bg-gray-900 rounded-lg p-8 mt-6 text-center border border-gray-800"
+          class="bg-white/5 rounded-lg p-8 mt-6 text-center border border-gray-800"
         >
           <div class="text-gray-400 text-lg">
             Please log in to view your transaction history.

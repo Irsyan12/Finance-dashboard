@@ -134,15 +134,19 @@ const clearForm = () => {
 <template>
   <AppLayout>
     <!-- Header -->
-    <Header
-      title="Add Transaction"
-      subtitle="Record a new income or expense transaction"
-    />
+    <div
+      class="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-white/10 flex-1"
+    >
+      <Header
+        title="Add Transaction"
+        subtitle="Record a new income or expense transaction"
+      />
+    </div>
 
     <!-- Form Card -->
     <div
       v-if="isLoggedIn"
-      class="bg-gray-900 rounded-lg shadow-lg mt-6 p-6 border border-gray-800"
+      class="bg-white/5 rounded-lg shadow-lg mt-6 p-6 border border-gray-800"
     >
       <form @submit.prevent="submitTransaction" class="space-y-6">
         <!-- Transaction Type -->
@@ -234,7 +238,7 @@ const clearForm = () => {
     <!-- Recent Transactions Preview -->
     <div
       v-if="isLoggedIn"
-      class="mt-8 bg-gray-900 rounded-lg shadow-lg p-6 border border-gray-800"
+      class="mt-8 bg-white/5 rounded-lg shadow-lg p-6 border border-gray-800"
     >
       <h3 class="text-lg font-semibold text-gray-200 mb-4">
         Recent Transactions
@@ -299,7 +303,7 @@ const clearForm = () => {
 
     <div
       v-if="!isLoggedIn"
-      class="bg-gray-900 rounded-lg p-8 mt-6 text-center border border-gray-800"
+      class="bg-white/5 rounded-lg p-8 mt-6 text-center border border-gray-800"
     >
       <div class="text-gray-400 text-lg">
         Please log in to view your transaction history.

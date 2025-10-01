@@ -49,7 +49,7 @@ const handleLogout = async () => {
 
 <template>
   <nav
-    class="fixed top-0 left-0 right-0 z-50 bg-gray-900 border-b border-gray-800 p-4 text-white flex justify-between items-center h-16"
+    class="fixed top-0 left-0 right-0 z-50 bg-gray-950 border-b border-gray-800 p-4 text-white flex justify-between items-center h-16"
   >
     <!-- Brand & Sidebar Toggle -->
     <div class="flex items-center gap-4">
@@ -64,7 +64,6 @@ const handleLogout = async () => {
       <router-link to="/" class="text-lg font-bold"
         >Finance Dashboard</router-link
       >
-      
     </div>
 
     <!-- Medium screen navbar -->

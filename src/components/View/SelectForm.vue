@@ -85,7 +85,7 @@ const getOptionLabel = (option) => {
     @change="handleChange"
     :required="required"
     :disabled="disabled"
-    class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed appearance-none"
+    class="w-full px-3 py-2 bg-white/5 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed appearance-none"
   >
     <option value="" disabled>{{ placeholder }}</option>
     <option
