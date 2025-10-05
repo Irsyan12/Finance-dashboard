@@ -1,6 +1,7 @@
 <script setup>
 import AppLayout from "../components/AppLayout.vue";
-import { ref, computed, onMounted, watch } from "vue";
+import LoginPrompt from "../components/ui/LoginPrompt.vue";
+import { ref, computed } from "vue";
 import { formatCurrency } from "@/services/supabase/data";
 import { useUserData } from "../composables/useData";
 import { useAlert } from "@/composables/useAlert";
@@ -69,7 +70,7 @@ const showFilters = ref(false);
 
 // Loading state
 const isLoading = computed(() => {
-  return transactionLoading.value || transactionsLoading.value || !user.value;
+  return transactionLoading.value || transactionsLoading.value;
 });
 
 // Get user's categories
@@ -199,6 +200,7 @@ const summary = computed(() => {
     <div class="space-y-6">
       <!-- Header -->
       <div
+        v-if="isLoggedIn"
         class="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-white/10 flex-1"
       >
         <div
@@ -211,6 +213,7 @@ const summary = computed(() => {
 
           <!-- Toggle Filters Button -->
           <button
+            v-if="isLoading"
             @click="showFilters = !showFilters"
             class="w-32 ms-auto mt-2 flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
@@ -411,14 +414,10 @@ const summary = computed(() => {
       </div>
 
       <!-- Transaction List -->
-      <div
+      <LoginPrompt
         v-if="!isLoggedIn"
-        class="bg-white/5 rounded-lg p-8 text-center border border-gray-800"
-      >
-        <div class="text-gray-400 text-lg">
-          Please log in to view your transaction history.
-        </div>
-      </div>
+        message="Please log in to view and manage your transaction history."
+      />
 
       <!-- Loading Skeleton for Transactions -->
       <TransactionListSkeleton v-else-if="isLoading" :count="5" />

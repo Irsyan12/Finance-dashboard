@@ -1,5 +1,6 @@
 <script setup>
 import AppLayout from "../components/AppLayout.vue";
+import LoginPrompt from "../components/ui/LoginPrompt.vue";
 import { ref, computed, watch } from "vue";
 import { transactions } from "@/services/supabase/data";
 import { useUserData } from "../composables/useData";
@@ -33,7 +34,7 @@ const {
 } = useCategories();
 
 const isLoading = computed(() => {
-  return categoriesLoading.value || !user.value;
+  return categoriesLoading.value;
 });
 
 // Fetch categories when user is available
@@ -170,9 +171,14 @@ const categoryUsageStats = computed(() => {
 
 <template>
   <AppLayout>
+    <LoginPrompt
+      v-if="!isLoggedIn"
+      message="Please log in to edit and manage your spending categories."
+    />
     <div class="space-y-6">
       <!-- Header -->
       <div
+        v-if="isLoggedIn"
         class="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-white/10 flex-1"
       >
         <Header
@@ -539,16 +545,8 @@ const categoryUsageStats = computed(() => {
             </div>
           </div>
         </div>
-
-        <div
-          v-if="!isLoggedIn"
-          class="bg-white/5 rounded-lg p-8 mt-6 text-center border border-gray-800"
-        >
-          <div class="text-gray-400 text-lg">
-            Please log in to view your transaction history.
-          </div>
-        </div>
       </div>
+
       <!-- Close main content wrapper -->
     </div>
   </AppLayout>

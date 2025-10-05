@@ -1,5 +1,6 @@
 <script setup>
 import AppLayout from "../components/AppLayout.vue";
+import LoginPrompt from "../components/ui/LoginPrompt.vue";
 import { computed } from "vue";
 import { useAuthStore } from "../stores/auth";
 import { useUserData } from "../composables/useData";
@@ -155,7 +156,11 @@ const formatPercentageChange = (change) => {
   >
     <AppLayout>
       <!-- Main Dashboard Content -->
-      <div class="space-y-8">
+      <LoginPrompt
+        v-if="!isLoggedIn"
+        message="Welcome to your Finance Dashboard! Please log in to view your financial overview and transaction history."
+      />
+      <div v-if="isLoggedIn" class="space-y-8">
         <!-- Welcome Section -->
         <div
           class="bg-white/5 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/10 relative overflow-hidden"
@@ -185,17 +190,12 @@ const formatPercentageChange = (change) => {
                 Here's what's happening with your finances today.
               </p>
             </div>
-            <div v-else>
-              <h1 class="text-3xl font-bold text-white">
-                Please log in to access your dashboard.
-              </h1>
-            </div>
           </div>
         </div>
 
         <!-- Dashboard Content Grid -->
         <div
-          v-if="isLoggedIn && !isLoading"
+          v-if="isLoggedIn"
           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
           <!-- Total Balance Card -->

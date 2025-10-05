@@ -7,6 +7,7 @@ import CurrencyInput from "../components/View/CurrencyInput.vue";
 import SelectForm from "../components/View/SelectForm.vue";
 import RadioGroup from "../components/View/RadioGroup.vue";
 import ButtonForm from "../components/View/ButtonForm.vue";
+import LoginPrompt from "../components/ui/LoginPrompt.vue";
 import { ref, watch, computed } from "vue";
 import { PlusIcon, XMarkIcon } from "@heroicons/vue/24/outline";
 import { useUserData } from "../composables/useData";
@@ -135,6 +136,7 @@ const clearForm = () => {
   <AppLayout>
     <!-- Header -->
     <div
+      v-if="isLoggedIn"
       class="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-white/10 flex-1"
     >
       <Header
@@ -301,14 +303,10 @@ const clearForm = () => {
       </div>
     </div>
 
-    <div
+    <LoginPrompt
       v-if="!isLoggedIn"
-      class="bg-white/5 rounded-lg p-8 mt-6 text-center border border-gray-800"
-    >
-      <div class="text-gray-400 text-lg">
-        Please log in to view your transaction history.
-      </div>
-    </div>
+      message="Please log in to add transactions and manage your finances."
+    />
   </AppLayout>
 </template>
 
