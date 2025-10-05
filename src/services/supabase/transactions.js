@@ -53,6 +53,28 @@ export const transactionService = {
     return data;
   },
 
+  // Get transaction by ID
+  async getById(id) {
+    const { data, error } = await supabase
+      .from("transactions")
+      .select(
+        `
+        *,
+        categories (
+          id,
+          name,
+          color,
+          type
+        )
+      `
+      )
+      .eq("id", id)
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
   // Update transaction
   async update(id, updates) {
     const { data, error } = await supabase

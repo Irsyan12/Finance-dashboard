@@ -8,6 +8,7 @@ import SelectForm from "../components/View/SelectForm.vue";
 import RadioGroup from "../components/View/RadioGroup.vue";
 import ButtonForm from "../components/View/ButtonForm.vue";
 import LoginPrompt from "../components/ui/LoginPrompt.vue";
+import Calendar from "../components/ui/Calendar.vue";
 import { ref, watch, computed } from "vue";
 import { PlusIcon, XMarkIcon } from "@heroicons/vue/24/outline";
 import { useUserData } from "../composables/useData";
@@ -104,13 +105,27 @@ const submitTransaction = async () => {
       return;
     }
 
+    // Validate date
+    if (!form.value.date) {
+      toast.error("Date is required", {
+        description: "Please select a transaction date",
+      });
+      return;
+    }
+
+    // Format date for database (ensure it's in YYYY-MM-DD format)
+    let formattedDate = form.value.date;
+    if (form.value.date instanceof Date) {
+      formattedDate = form.value.date.toISOString().split("T")[0];
+    }
+
     // Prepare transaction data for database
     const transactionData = {
       type: form.value.type,
       amount: numericAmount,
       description: form.value.description,
       category_id: categoryId, // Use the categoryId directly (UUID or integer)
-      date: form.value.date,
+      date: formattedDate,
     };
 
     // Save to database using useTransactions
@@ -209,7 +224,11 @@ const clearForm = () => {
         <!-- Date -->
         <div>
           <LabelInput for="date" label="Date" LabelIcon="CalendarIcon" />
-          <InputForm id="date" v-model="form.date" type="date" required />
+          <Calendar
+            v-model="form.date"
+            placeholder="Select transaction date"
+            format="yyyy-MM-dd"
+          />
         </div>
 
         <!-- Actions -->

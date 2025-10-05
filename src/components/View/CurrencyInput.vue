@@ -66,26 +66,28 @@ watch(
 const handleInput = async (event) => {
   const inputValue = event.target.value;
 
-  // Remove all non-numeric characters
-  const numericOnly = inputValue.replace(/\D/g, "");
+  // Ambil hanya angka
+  let numericOnly = inputValue.replace(/\D/g, "");
 
-  if (numericOnly) {
-    const number = Number(numericOnly);
-    const formatted = formatNumber(number);
+  // Hapus nol di depan
+  numericOnly = numericOnly.replace(/^0+(?!$)/, "");
 
-    // Update display value
-    displayValue.value = formatted;
-
-    // Set cursor position after formatting
-    await nextTick();
-    setCursorPosition(event.target, formatted);
-
-    // Emit the numeric value
-    emit("update:modelValue", number);
-  } else {
+  // Jika hasil akhirnya kosong (berarti cuma nol)
+  if (!numericOnly || numericOnly === "0") {
     displayValue.value = "";
     emit("update:modelValue", "");
+    return;
   }
+
+  const number = Number(numericOnly);
+  const formatted = formatNumber(number);
+
+  displayValue.value = formatted;
+
+  await nextTick();
+  setCursorPosition(event.target, formatted);
+
+  emit("update:modelValue", number);
 };
 
 // Handle paste event
@@ -94,16 +96,21 @@ const handlePaste = (event) => {
   const pastedText = (event.clipboardData || window.clipboardData).getData(
     "text"
   );
-  const numericOnly = pastedText.replace(/\D/g, "");
+  let numericOnly = pastedText.replace(/\D/g, "");
 
-  if (numericOnly) {
-    const number = Number(numericOnly);
-    displayValue.value = formatNumber(number);
-    emit("update:modelValue", number);
-  } else {
+  // Hapus nol di depan
+  numericOnly = numericOnly.replace(/^0+(?!$)/, "");
+
+  // Jika hasil akhirnya kosong (berarti cuma nol)
+  if (!numericOnly || numericOnly === "0") {
     displayValue.value = "";
     emit("update:modelValue", "");
+    return;
   }
+
+  const number = Number(numericOnly);
+  displayValue.value = formatNumber(number);
+  emit("update:modelValue", number);
 };
 
 // Set cursor position after formatting
@@ -135,6 +142,22 @@ const handleKeydown = (event) => {
 
   if (!isNumber && !isAllowed && !isCtrlCmd) {
     event.preventDefault();
+    return;
+  }
+
+  // ✅ Cegah mengetik "0" di awal input
+  if (event.key === "0") {
+    const input = event.target;
+    const selectionStart = input.selectionStart;
+    const currentValue = input.value;
+
+    // Kalau input masih kosong atau semua karakter masih nol -> blokir 0
+    const numericOnly = currentValue.replace(/\D/g, "");
+    const caretAtStart = selectionStart === 0;
+
+    if (numericOnly === "" || caretAtStart || /^0+$/.test(numericOnly)) {
+      event.preventDefault();
+    }
   }
 };
 </script>
@@ -163,4 +186,19 @@ const handleKeydown = (event) => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px rgba(255, 255, 255, 0.05) inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  transition: background-color 5000s ease-in-out 0s;
+  caret-color: #ffffff !important;
+}
+</style>

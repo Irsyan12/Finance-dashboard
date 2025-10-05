@@ -108,12 +108,37 @@ export const useTransactions = () => {
       // Update cache
       setCachedData("transactions", transactions.value, user.value.id);
 
-      toast.success("Transaction updated successfully!");
+      // Remove toast from here to prevent duplicate with modal toast
+      // toast.success("Transaction updated successfully!");
 
       return updatedTransaction;
     } catch (err) {
       error.value = err.message;
       toast.error("Failed to update transaction", {
+        description: err.message,
+      });
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  // Get transaction by ID
+  const getTransactionById = async (id) => {
+    try {
+      // First try to find in local state
+      const localTransaction = transactions.value.find((t) => t.id === id);
+      if (localTransaction) {
+        return localTransaction;
+      }
+
+      // If not found locally, fetch from server
+      loading.value = true;
+      const transaction = await transactionService.getById(id);
+      return transaction;
+    } catch (err) {
+      error.value = err.message;
+      toast.error("Failed to fetch transaction", {
         description: err.message,
       });
       throw err;
@@ -184,6 +209,7 @@ export const useTransactions = () => {
     clearTransactionCache,
     recentTransactions,
     updateTransaction,
+    getTransactionById,
     deleteTransaction,
     totalIncome,
     totalExpenses,

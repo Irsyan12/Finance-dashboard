@@ -1,6 +1,7 @@
 <script setup>
 import AppLayout from "../components/AppLayout.vue";
 import LoginPrompt from "../components/ui/LoginPrompt.vue";
+import EditTransactionModal from "../components/modal/editTransactionModal.vue";
 import { ref, computed } from "vue";
 import { formatCurrency } from "@/services/supabase/data";
 import { useUserData } from "../composables/useData";
@@ -67,6 +68,28 @@ const deleteTransactionAction = async (transactionId) => {
 };
 
 const showFilters = ref(false);
+
+// Edit modal state
+const showEditModal = ref(false);
+const editingTransactionId = ref(null);
+
+// Edit transaction function
+const editTransaction = (transactionId) => {
+  editingTransactionId.value = transactionId;
+  showEditModal.value = true;
+};
+
+// Handle modal close
+const closeEditModal = () => {
+  showEditModal.value = false;
+  editingTransactionId.value = null;
+};
+
+// Handle transaction updated
+const handleTransactionUpdated = () => {
+  // Refresh data di background tanpa menutup modal (modal akan close sendiri)
+  fetchTransactions({ forceRefresh: true });
+};
 
 // Loading state
 const isLoading = computed(() => {
@@ -381,33 +404,181 @@ const summary = computed(() => {
         <SummarySkeleton v-if="isLoading" :count="4" />
 
         <!-- Real Summary Statistics -->
-        <div v-else class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div class="bg-white/5 rounded-lg p-4 border border-gray-800">
-            <div class="text-sm text-gray-400 mb-1">Total Transactions</div>
-            <div class="text-2xl font-bold text-white">{{ summary.count }}</div>
-          </div>
-          <div class="bg-white/5 rounded-lg p-4 border border-gray-800">
-            <div class="text-sm text-gray-400 mb-1">Total Income</div>
-            <div class="text-2xl font-bold text-green-400">
-              +{{ formatCurrency(summary.income) }}
+        <div v-else class="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <!-- Total Transactions -->
+          <div
+            class="group bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.02] relative overflow-hidden cursor-default"
+          >
+            <!-- Card Background Glow -->
+            <div
+              class="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            ></div>
+
+            <div class="relative z-10">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-gray-400 mb-2 font-medium">
+                    Total Transactions
+                  </p>
+                  <p
+                    class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent"
+                  >
+                    {{ summary.count }}
+                  </p>
+                </div>
+                <div
+                  class="p-3 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-xl border border-blue-400/30"
+                >
+                  <BanknotesIcon class="w-6 h-6 text-blue-400" />
+                </div>
+              </div>
             </div>
           </div>
-          <div class="bg-white/5 rounded-lg p-4 border border-gray-800">
-            <div class="text-sm text-gray-400 mb-1">Total Expense</div>
-            <div class="text-2xl font-bold text-red-400">
-              -{{ formatCurrency(summary.expense) }}
+
+          <!-- Total Income -->
+          <div
+            class="group bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.02] relative overflow-hidden cursor-default"
+          >
+            <!-- Card Background Glow -->
+            <div
+              class="absolute inset-0 bg-gradient-to-br from-green-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            ></div>
+
+            <div class="relative z-10">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-gray-400 mb-2 font-medium">
+                    Total Income
+                  </p>
+                  <p
+                    class="text-2xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent"
+                  >
+                    +{{ formatCurrency(summary.income) }}
+                  </p>
+                </div>
+                <div
+                  class="p-3 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl border border-green-400/30"
+                >
+                  <svg
+                    class="w-6 h-6 text-green-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M7 11l5-5m0 0l5 5m-5-5v12"
+                    ></path>
+                  </svg>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="bg-white/5 rounded-lg p-4 border border-gray-800">
-            <div class="text-sm text-gray-400 mb-1">Net Balance</div>
+
+          <!-- Total Expense -->
+          <div
+            class="group bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.02] relative overflow-hidden cursor-default"
+          >
+            <!-- Card Background Glow -->
+            <div
+              class="absolute inset-0 bg-gradient-to-br from-red-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            ></div>
+
+            <div class="relative z-10">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-gray-400 mb-2 font-medium">
+                    Total Expense
+                  </p>
+                  <p
+                    class="text-2xl font-bold bg-gradient-to-r from-red-400 to-pink-400 bg-clip-text text-transparent"
+                  >
+                    -{{ formatCurrency(summary.expense) }}
+                  </p>
+                </div>
+                <div
+                  class="p-3 bg-gradient-to-r from-red-500/20 to-pink-500/20 rounded-xl border border-red-400/30"
+                >
+                  <svg
+                    class="w-6 h-6 text-red-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M17 13l-5 5m0 0l-5-5m5 5V6"
+                    ></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Net Balance -->
+          <div
+            class="group bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.02] relative overflow-hidden cursor-default"
+          >
+            <!-- Card Background Glow -->
             <div
               :class="[
-                'text-2xl font-bold',
-                summary.balance >= 0 ? 'text-green-400' : 'text-red-400',
+                'absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300',
+                summary.balance >= 0
+                  ? 'bg-gradient-to-br from-emerald-600/10 to-transparent'
+                  : 'bg-gradient-to-br from-red-600/10 to-transparent',
               ]"
-            >
-              {{ summary.balance >= 0 ? "+" : ""
-              }}{{ formatCurrency(summary.balance) }}
+            ></div>
+
+            <div class="relative z-10">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm text-gray-400 mb-2 font-medium">
+                    Net Balance
+                  </p>
+                  <p
+                    :class="[
+                      'text-2xl font-bold bg-gradient-to-r bg-clip-text text-transparent',
+                      summary.balance >= 0
+                        ? 'from-emerald-400 to-cyan-400'
+                        : 'from-red-400 to-pink-400',
+                    ]"
+                  >
+                    {{ summary.balance >= 0 ? "+" : ""
+                    }}{{ formatCurrency(summary.balance) }}
+                  </p>
+                </div>
+                <div
+                  :class="[
+                    'p-3 rounded-xl border',
+                    summary.balance >= 0
+                      ? 'bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 border-emerald-400/30'
+                      : 'bg-gradient-to-r from-red-500/20 to-pink-500/20 border-red-400/30',
+                  ]"
+                >
+                  <svg
+                    :class="[
+                      'w-6 h-6',
+                      summary.balance >= 0
+                        ? 'text-emerald-400'
+                        : 'text-red-400',
+                    ]"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+                    ></path>
+                  </svg>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -437,51 +608,70 @@ const summary = computed(() => {
         </button>
       </div>
 
-      <div v-else class="space-y-3">
+      <div v-else class="space-y-4">
         <div
           v-for="(transaction, index) in filteredTransactions"
           :key="transaction.id"
-          class="bg-white/5 rounded-lg p-4 border border-gray-800 hover:border-gray-700 transition-all duration-200 hover:shadow-lg"
+          class="group bg-white/5 backdrop-blur-xl rounded-2xl shadow-xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.01] relative overflow-hidden"
         >
-          <div class="flex items-center justify-between">
+          <!-- Background Glow Effect -->
+          <div
+            class="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          ></div>
+
+          <div class="relative flex items-center justify-between">
             <!-- Left side - Transaction Info -->
-            <div class="flex items-center space-x-4">
-              <!-- Category Color Indicator -->
+            <div class="flex items-center space-x-4 flex-1 min-w-0">
+              <!-- Category Color Indicator with Icon -->
               <div
                 :style="{
                   backgroundColor:
                     getCategoryByIdFromRealData(transaction.category_id)
                       ?.color || '#6b7280',
                 }"
-                class="w-3 h-12 rounded-full flex-shrink-0"
+                class="w-3 h-15 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg"
               ></div>
 
               <!-- Transaction Details -->
-              <div class="items-center min-w-0">
-                <div class="flex items-center mb-2">
-                  <h3 class="text-lg font-semibold text-gray-200 mb-1">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-lg font-semibold text-white truncate pr-4">
                     {{ transaction.description || "No description" }}
                   </h3>
-                  <div class="ml-2">
-                    <button>
-                      <PencilIcon
-                        class="w-4 h-4 justify-center mr-3 text-gray-300 cursor-pointer hover:text-gray-400"
-                      />
+
+                  <!-- Action Buttons - Modern Floating Style -->
+                  <div
+                    class="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0"
+                  >
+                    <!-- Edit Button -->
+                    <button
+                      type="button"
+                      @click="editTransaction(transaction.id)"
+                      class="flex items-center justify-center w-8 h-8 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg border border-blue-400/30 hover:border-blue-400/50 transition-all duration-200 hover:scale-110"
+                      title="Edit Transaction"
+                    >
+                      <PencilIcon class="w-4 h-4 text-blue-400" />
                     </button>
-                    <button @click="deleteTransactionAction(transaction.id)">
-                      <TrashIcon
-                        class="w-4 h-4 justify-center text-red-500 hover:text-red-700 cursor-pointer"
-                      />
+
+                    <!-- Delete Button -->
+                    <button
+                      type="button"
+                      @click="deleteTransactionAction(transaction.id)"
+                      class="flex items-center justify-center w-8 h-8 bg-red-500/20 hover:bg-red-500/30 rounded-lg border border-red-400/30 hover:border-red-400/50 transition-all duration-200 hover:scale-110"
+                      title="Delete Transaction"
+                    >
+                      <TrashIcon class="w-4 h-4 text-red-400" />
                     </button>
                   </div>
                 </div>
+
                 <div class="flex items-center space-x-4 text-sm text-gray-400">
                   <span class="flex items-center">
-                    <CalendarDaysIcon class="w-4 h-4 mr-1" />
+                    <CalendarDaysIcon class="w-4 h-4 mr-1.5" />
                     {{ formatRelativeDate(transaction.date) }}
                   </span>
                   <span class="flex items-center">
-                    <TagIcon class="w-4 h-4 mr-1" />
+                    <TagIcon class="w-4 h-4 mr-1.5" />
                     {{
                       getCategoryByIdFromRealData(transaction.category_id)
                         ?.name || "Unknown Category"
@@ -492,10 +682,10 @@ const summary = computed(() => {
             </div>
 
             <!-- Right side - Amount -->
-            <div class="text-right">
+            <div class="text-right flex-shrink-0 ml-4">
               <div
                 :class="[
-                  'text-xl font-bold',
+                  'text-xl font-bold mb-1',
                   transaction.type === 'income'
                     ? 'text-green-400'
                     : 'text-red-400',
@@ -504,19 +694,28 @@ const summary = computed(() => {
                 {{ transaction.type === "income" ? "+" : "-" }}
                 {{ formatCurrency(transaction.amount) }}
               </div>
-              <div class="text-sm text-gray-400 capitalize">
+              <div
+                :class="[
+                  'text-sm font-medium capitalize px-2 py-1 rounded-full',
+                  transaction.type === 'income'
+                    ? 'text-green-300 bg-green-500/10'
+                    : 'text-red-300 bg-red-500/10',
+                ]"
+              >
                 {{ transaction.type }}
               </div>
             </div>
           </div>
-
-          <!-- Separator line (except for last item) -->
-          <div
-            v-if="index < filteredTransactions.length - 1"
-            class="mt-4 border-b border-gray-800"
-          ></div>
         </div>
       </div>
     </div>
+
+    <!-- Edit Transaction Modal -->
+    <EditTransactionModal
+      :is-open="showEditModal"
+      :transaction-id="editingTransactionId"
+      @close="closeEditModal"
+      @updated="handleTransactionUpdated"
+    />
   </AppLayout>
 </template>
