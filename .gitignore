@@ -28,4 +28,7 @@ coverage
 *.sw?
 .env
 
+# Vercel
+.vercel
+
 *.tsbuildinfo
